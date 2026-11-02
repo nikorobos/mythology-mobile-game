@@ -25,6 +25,9 @@ class Economy {
     this.dupShards = 10,
     this.starShardCosts = const [10, 20, 40, 80],
     this.starStatGrowth = 0.2,
+    this.idleGoldFraction = 0.1,
+    this.maxIdleMinutes = 480,
+    this.adMultiplier = 2,
   });
 
   final int startGold;
@@ -50,6 +53,15 @@ class Economy {
   final int dupShards;
   final List<int> starShardCosts;
   final double starStatGrowth;
+
+  /// Idle gold per minute = this * win gold of the best cleared stage.
+  final double idleGoldFraction;
+
+  /// Idle gold stops growing after this many minutes away.
+  final int maxIdleMinutes;
+
+  /// Collect bonus for watching a rewarded ad.
+  final int adMultiplier;
 
   factory Economy.fromJson(Map<String, dynamic> j) {
     double d(String k, double def) => (j[k] as num?)?.toDouble() ?? def;
@@ -84,6 +96,9 @@ class Economy {
           ? base.starShardCosts
           : List<int>.from(j['starShardCosts'] as List),
       starStatGrowth: d('starStatGrowth', base.starStatGrowth),
+      idleGoldFraction: d('idleGoldFraction', base.idleGoldFraction),
+      maxIdleMinutes: i('maxIdleMinutes', base.maxIdleMinutes),
+      adMultiplier: i('adMultiplier', base.adMultiplier),
     );
   }
 
@@ -107,6 +122,10 @@ class Economy {
   /// Gems for [count] summons (10 is discounted).
   int summonCost(int count) =>
       count == 10 ? summonTenCost : summonSingleCost * count;
+
+  /// Idle gold per minute while the best cleared stage is [stage].
+  double idleGoldPerMinute(int stage) =>
+      battleReward(stage, won: true) * idleGoldFraction;
 
   /// Gold for finishing a battle on [stage]. A loss still pays a little,
   /// so progress never fully stalls.

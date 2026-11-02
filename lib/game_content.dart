@@ -5,6 +5,7 @@ import 'core/economy.dart';
 import 'core/models.dart';
 import 'core/stages.dart';
 import 'l10n/strings.dart';
+import 'services/ad_service.dart';
 import 'state/player_controller.dart';
 
 const int maxSquadSize = 5;
@@ -33,10 +34,11 @@ class GameContent {
 
 /// Everything the UI needs: static content + the player's saved progress.
 class Session {
-  const Session(this.content, this.player);
+  const Session(this.content, this.player, this.ads);
 
   final GameContent content;
   final PlayerController player;
+  final AdService ads;
 }
 
 Future<Session> loadSession() async {
@@ -50,5 +52,9 @@ Future<Session> loadSession() async {
       parseEconomy(await rootBundle.loadString('assets/data/economy.json'));
   final strings = await Strings.load();
   final player = await PlayerController.load(economy);
-  return Session(GameContent(heroes, monsters, config, economy, strings), player);
+  return Session(
+    GameContent(heroes, monsters, config, economy, strings),
+    player,
+    StubAdService(),
+  );
 }

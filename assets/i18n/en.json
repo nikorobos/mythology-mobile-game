@@ -127,5 +127,9 @@
   "rarity.common": "Common",
   "rarity.rare": "Rare",
   "rarity.epic": "Epic",
-  "rarity.legendary": "Legendary"
+  "rarity.legendary": "Legendary",
+  "ui.idle": "Idle rewards",
+  "ui.collect": "Collect",
+  "ui.collect_ad": "Collect x2 (watch ad)",
+  "ui.idle_full": "FULL"
 }

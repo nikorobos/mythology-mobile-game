@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'game_content.dart';
+import 'ui/idle_panel.dart';
 import 'ui/squad_screen.dart';
 import 'ui/summon_screen.dart';
 
@@ -81,6 +82,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Text(session?.content.strings.t('ui.summon') ?? '...'),
                   ),
                 ),
+                if (session != null) ...[
+                  const SizedBox(height: 24),
+                  IdlePanel(session: session),
+                ],
               ],
             );
           },

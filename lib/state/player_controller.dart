@@ -32,7 +32,31 @@ class PlayerController extends ChangeNotifier {
       // Corrupt save: start fresh rather than crash.
       state = PlayerState.initial(economy);
     }
-    return PlayerController._(prefs, state, economy);
+    final controller = PlayerController._(prefs, state, economy);
+    if (state.lastCollectMs == null) {
+      // First run (or old save): idle gold starts counting now.
+      state.lastCollectMs = controller.nowMs;
+      controller._save();
+    }
+    return controller;
+  }
+
+  /// Replaceable clock (tests).
+  DateTime Function() clock = DateTime.now;
+
+  int get nowMs => clock().millisecondsSinceEpoch;
+
+  int pendingIdle() => state.idleGoldPending(nowMs, economy);
+
+  int get maxIdleGold => state.maxIdleGold(economy);
+
+  /// Returns the gold collected.
+  int collectIdle({int multiplier = 1}) {
+    final amount =
+        state.collectIdle(nowMs, economy, multiplier: multiplier);
+    _save();
+    notifyListeners();
+    return amount;
   }
 
   void _save() => _prefs.setString(_key, jsonEncode(state.toJson()));

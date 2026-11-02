@@ -1,6 +1,6 @@
 // Pure Dart player progress. Saved as JSON (see lib/state).
 
-import 'dart:math' show Random;
+import 'dart:math' show Random, max, min;
 
 import 'economy.dart';
 import 'models.dart';
@@ -33,6 +33,7 @@ class PlayerState {
     Map<String, int>? shards,
     this.pity = 0,
     this.highestStageCleared = 0,
+    this.lastCollectMs,
   })  : heroLevels = heroLevels ?? {},
         stars = stars ?? {},
         shards = shards ?? {};
@@ -54,6 +55,9 @@ class PlayerState {
   /// Pulls since the last epic (for the guarantee).
   int pity;
   int highestStageCleared;
+
+  /// When idle gold was last collected (ms since epoch). Null = not started.
+  int? lastCollectMs;
 
   bool owns(String heroId) => stars.containsKey(heroId);
   int starsOf(String heroId) => stars[heroId] ?? 0;
@@ -157,6 +161,30 @@ class PlayerState {
     return weights.keys.first;
   }
 
+  // ---- idle rewards ----
+
+  double _idleRate(Economy e) =>
+      e.idleGoldPerMinute(max(1, highestStageCleared));
+
+  /// Most idle gold that can pile up while away.
+  int maxIdleGold(Economy e) => (e.maxIdleMinutes * _idleRate(e)).floor();
+
+  /// Idle gold waiting at [nowMs]. A clock set backwards gives 0.
+  int idleGoldPending(int nowMs, Economy e) {
+    final last = lastCollectMs;
+    if (last == null || nowMs <= last) return 0;
+    final minutes = min((nowMs - last) / 60000.0, e.maxIdleMinutes.toDouble());
+    return (minutes * _idleRate(e)).floor();
+  }
+
+  /// Adds the waiting idle gold (times [multiplier]) and restarts the timer.
+  int collectIdle(int nowMs, Economy e, {int multiplier = 1}) {
+    final amount = idleGoldPending(nowMs, e) * multiplier;
+    gold += amount;
+    lastCollectMs = nowMs;
+    return amount;
+  }
+
   // ---- save ----
 
   Map<String, dynamic> toJson() => {
@@ -168,6 +196,7 @@ class PlayerState {
         'shards': shards,
         'pity': pity,
         'highestStageCleared': highestStageCleared,
+        'lastCollectMs': lastCollectMs,
       };
 
   /// Older saves (v1) had no stars/gems: they get the starter heroes and
@@ -187,6 +216,7 @@ class PlayerState {
       shards: ints(j['shards']),
       pity: (j['pity'] as int?) ?? 0,
       highestStageCleared: (j['highestStageCleared'] as int?) ?? 0,
+      lastCollectMs: j['lastCollectMs'] as int?,
     );
   }
 }

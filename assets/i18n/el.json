@@ -127,5 +127,9 @@
   "rarity.common": "Κοινός",
   "rarity.rare": "Σπάνιος",
   "rarity.epic": "Επικός",
-  "rarity.legendary": "Θρυλικός"
+  "rarity.legendary": "Θρυλικός",
+  "ui.idle": "Παθητικές ανταμοιβές",
+  "ui.collect": "Συλλογή",
+  "ui.collect_ad": "Συλλογή x2 (διαφήμιση)",
+  "ui.idle_full": "ΓΕΜΑΤΟ"
 }

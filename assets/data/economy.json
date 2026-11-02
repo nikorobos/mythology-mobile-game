@@ -1,8 +1,12 @@
 {
-  "_note": "PLACEHOLDER economy. Hero stat = base * (1 + levelStatGrowth*(L-1)) * (1 + starStatGrowth*(stars-1)). Level-up cost = levelCostBase * levelCostGrowth^(L-1). Battle gold = winGoldBase * winGoldGrowth^(stage-1); a loss pays loseGoldFraction. Gems come from first clears. Summon: weights by rarity, epic guaranteed after pityEpic pulls without one; a duplicate gives dupShards; star s -> s+1 costs starShardCosts[s-1].",
+  "_note": "PLACEHOLDER economy. Hero stat = base * (1 + levelStatGrowth*(L-1)) * (1 + starStatGrowth*(stars-1)). Level-up cost = levelCostBase * levelCostGrowth^(L-1). Battle gold = winGoldBase * winGoldGrowth^(stage-1); a loss pays loseGoldFraction. Gems come from first clears. Summon: weights by rarity, epic guaranteed after pityEpic pulls without one; a duplicate gives dupShards; star s -> s+1 costs starShardCosts[s-1]. Idle: gold per minute = idleGoldFraction * win gold of the best cleared stage; stops after maxIdleMinutes away; the ad button multiplies by adMultiplier.",
   "startGold": 500,
   "startGems": 300,
-  "starterHeroes": ["heracles", "achilles", "asclepius"],
+  "starterHeroes": [
+    "heracles",
+    "achilles",
+    "asclepius"
+  ],
   "maxLevel": 100,
   "levelStatGrowth": 0.12,
   "levelCostBase": 100,
@@ -14,9 +18,20 @@
   "bossClearGems": 60,
   "summonSingleCost": 100,
   "summonTenCost": 900,
-  "rarityWeights": {"rare": 70, "epic": 30},
+  "rarityWeights": {
+    "rare": 70,
+    "epic": 30
+  },
   "pityEpic": 10,
   "dupShards": 10,
-  "starShardCosts": [10, 20, 40, 80],
-  "starStatGrowth": 0.2
+  "starShardCosts": [
+    10,
+    20,
+    40,
+    80
+  ],
+  "starStatGrowth": 0.2,
+  "idleGoldFraction": 0.1,
+  "maxIdleMinutes": 480,
+  "adMultiplier": 2
 }

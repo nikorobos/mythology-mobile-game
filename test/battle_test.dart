@@ -419,6 +419,53 @@ void main() {
     });
   });
 
+  group('idle rewards', () {
+    final eco =
+        parseEconomy(File('assets/data/economy.json').readAsStringSync());
+    const minute = 60000;
+
+    test('rate follows the best cleared stage', () {
+      // Stage 1 win = 50 gold, fraction 0.1 -> 5 gold per minute.
+      expect(eco.idleGoldPerMinute(1), closeTo(5, 1e-9));
+      expect(eco.idleGoldPerMinute(10) > eco.idleGoldPerMinute(1), isTrue);
+    });
+
+    test('gold piles up over time, stops at the cap', () {
+      final p = PlayerState(lastCollectMs: 0);
+      expect(p.idleGoldPending(10 * minute, eco), 50);
+      final cap = p.maxIdleGold(eco);
+      expect(cap, 480 * 5);
+      expect(p.idleGoldPending(100000 * minute, eco), cap);
+    });
+
+    test('nothing before the timer started or if the clock went back', () {
+      expect(PlayerState().idleGoldPending(5 * minute, eco), 0);
+      final p = PlayerState(lastCollectMs: 10 * minute);
+      expect(p.idleGoldPending(5 * minute, eco), 0);
+    });
+
+    test('collect adds gold, restarts the timer, ad multiplies', () {
+      final p = PlayerState(gold: 0, lastCollectMs: 0);
+      expect(p.collectIdle(10 * minute, eco), 50);
+      expect(p.gold, 50);
+      expect(p.idleGoldPending(10 * minute, eco), 0);
+      final got = p.collectIdle(20 * minute, eco, multiplier: eco.adMultiplier);
+      expect(got, 100);
+      expect(p.gold, 150);
+    });
+
+    test('best cleared stage raises idle income', () {
+      final p = PlayerState(lastCollectMs: 0, highestStageCleared: 10);
+      expect(p.idleGoldPending(10 * minute, eco) > 50, isTrue);
+    });
+
+    test('lastCollectMs survives save and load', () {
+      final p = PlayerState(lastCollectMs: 12345);
+      expect(PlayerState.fromJson(p.toJson(), eco).lastCollectMs, 12345);
+      expect(PlayerState.fromJson({}, eco).lastCollectMs, isNull);
+    });
+  });
+
   test('formatNumber abbreviates', () {
     expect(formatNumber(999), '999');
     expect(formatNumber(1500), '1.50K');
