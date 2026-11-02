@@ -1,0 +1,23 @@
+{
+  "_note": "PLACEHOLDER stats for prototype only.",
+  "units": [
+    {
+      "id": "minotaur", "nameKey": "monster.minotaur.name", "mythology": "greek",
+      "tags": ["greek", "monster"], "role": "tank", "range": "melee", "rarity": "rare", "ai": true,
+      "baseStats": {"hp": 1000, "atk": 70, "def": 50, "spd": 35},
+      "skills": [{"id": "charge", "nameKey": "skill.charge.name", "descKey": "skill.charge.desc"}]
+    },
+    {
+      "id": "shadow_jackal", "nameKey": "monster.shadow_jackal.name", "mythology": "egyptian",
+      "tags": ["egyptian", "monster", "minion"], "role": "dps", "range": "melee", "rarity": "common", "ai": true,
+      "baseStats": {"hp": 400, "atk": 50, "def": 20, "spd": 55},
+      "skills": []
+    },
+    {
+      "id": "fenrir", "nameKey": "monster.fenrir.name", "mythology": "norse",
+      "tags": ["norse", "monster"], "role": "dps", "range": "melee", "rarity": "epic", "ai": true,
+      "baseStats": {"hp": 1100, "atk": 95, "def": 45, "spd": 58},
+      "skills": [{"id": "howl", "nameKey": "skill.howl.name", "descKey": "skill.howl.desc"}]
+    }
+  ]
+}

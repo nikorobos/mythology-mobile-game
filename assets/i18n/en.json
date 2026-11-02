@@ -1,0 +1,21 @@
+{
+  "app.title": "Theomyth: Idle RPG",
+  "ui.battle": "BATTLE",
+  "ui.auto": "AUTO",
+  "hero.heracles.name": "Heracles",
+  "hero.achilles.name": "Achilles",
+  "hero.asclepius.name": "Asclepius",
+  "monster.minotaur.name": "Minotaur",
+  "monster.shadow_jackal.name": "Shadow Jackal",
+  "monster.fenrir.name": "Fenrir",
+  "skill.nemean_guard.name": "Nemean Guard",
+  "skill.nemean_guard.desc": "Taunts enemies and reduces damage taken.",
+  "skill.wrath_of_troy.name": "Wrath of Troy",
+  "skill.wrath_of_troy.desc": "Lunges at the weakest enemy with 3 hits.",
+  "skill.serpents_remedy.name": "Serpent's Remedy",
+  "skill.serpents_remedy.desc": "Heals the weakest ally and cleanses.",
+  "skill.charge.name": "Charge",
+  "skill.charge.desc": "Stuns the front hero.",
+  "skill.howl.name": "Howl",
+  "skill.howl.desc": "Wolves gain ATK."
+}

@@ -1,0 +1,21 @@
+{
+  "app.title": "Theomyth: Idle RPG",
+  "ui.battle": "ΜΑΧΗ",
+  "ui.auto": "ΑΥΤΟΜΑΤΟ",
+  "hero.heracles.name": "Ηρακλής",
+  "hero.achilles.name": "Αχιλλέας",
+  "hero.asclepius.name": "Ασκληπιός",
+  "monster.minotaur.name": "Μινώταυρος",
+  "monster.shadow_jackal.name": "Τσακάλι της Σκιάς",
+  "monster.fenrir.name": "Φένρι",
+  "skill.nemean_guard.name": "Νεμεαία Άμυνα",
+  "skill.nemean_guard.desc": "Προκαλεί τους εχθρούς και μειώνει τη ζημιά που δέχεται.",
+  "skill.wrath_of_troy.name": "Οργή της Τροίας",
+  "skill.wrath_of_troy.desc": "Ορμά στον πιο αδύναμο εχθρό με 3 χτυπήματα.",
+  "skill.serpents_remedy.name": "Θεραπεία του Φιδιού",
+  "skill.serpents_remedy.desc": "Θεραπεύει τον πιο αδύναμο σύμμαχο και καθαρίζει.",
+  "skill.charge.name": "Έφοδος",
+  "skill.charge.desc": "Αναισθητοποιεί τον πρώτο ήρωα.",
+  "skill.howl.name": "Ουρλιαχτό",
+  "skill.howl.desc": "Οι λύκοι αποκτούν ΕΠΘ."
+}
