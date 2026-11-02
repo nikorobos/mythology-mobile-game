@@ -4,7 +4,6 @@ import '../core/format.dart';
 import '../core/models.dart';
 import '../core/player.dart';
 import '../game_content.dart';
-import 'battle_screen.dart';
 
 const _bg = Color(0xFF14122B);
 const _panel = Color(0xFF1D1A3D);
