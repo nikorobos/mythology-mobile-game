@@ -567,6 +567,7 @@ class AppNavBar extends StatelessWidget {
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 56),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(items[i].icon,
