@@ -283,8 +283,9 @@ void main() {
     test('unitAtLevel scales HP and ATK only', () {
       final h = heroes.first;
       final l11 = unitAtLevel(h, 11, eco);
-      expect(l11.baseStats.hp, (h.baseStats.hp * 2.2).round());
-      expect(l11.baseStats.atk, (h.baseStats.atk * 2.2).round());
+      final m = eco.statMult(11); // follows economy.json, not a hardcoded number
+      expect(l11.baseStats.hp, (h.baseStats.hp * m).round());
+      expect(l11.baseStats.atk, (h.baseStats.atk * m).round());
       expect(l11.baseStats.def, h.baseStats.def);
       expect(l11.baseStats.spd, h.baseStats.spd);
       expect(l11.ultimate, isNotNull);
