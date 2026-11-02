@@ -709,3 +709,13 @@ class MonsterFigure extends StatelessWidget {
         ),
       );
 }
+
+/// Icon for an equipment slot id (weapon, armor, helm, boots, relic, ring).
+IconData slotIcon(String slot) => switch (slot) {
+      'weapon' => Icons.gavel,
+      'armor' => Icons.shield_outlined,
+      'helm' => Icons.sports_motorsports_outlined,
+      'boots' => Icons.directions_walk,
+      'relic' => Icons.auto_awesome_outlined,
+      _ => Icons.circle_outlined,
+    };

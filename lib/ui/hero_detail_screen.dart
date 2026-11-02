@@ -22,16 +22,6 @@ IconData _skillIcon(Skill k) => switch (k.type) {
       SkillType.none => Icons.circle_outlined,
     };
 
-IconData _slotIcon(String slot) => switch (slot) {
-      'weapon' => Icons.gavel,
-      'armor' => Icons.shield_outlined,
-      'helm' => Icons.sports_motorsports_outlined,
-      'boots' => Icons.directions_walk,
-      'relic' => Icons.auto_awesome_outlined,
-      'ring' => Icons.circle_outlined,
-      _ => Icons.circle_outlined,
-    };
-
 /// Hero detail (board: HeroDetail.dc.html). Pushed over the tabs.
 class HeroDetailScreen extends StatelessWidget {
   const HeroDetailScreen({
@@ -419,7 +409,7 @@ class HeroDetailScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(13),
             border: Border.all(color: border, width: 3),
           ),
-          child: Icon(item == null ? Icons.add : _slotIcon(slot),
+          child: Icon(item == null ? Icons.add : slotIcon(slot),
               size: 24, color: item == null ? Pal.muted : Pal.cream),
         ),
       ),
