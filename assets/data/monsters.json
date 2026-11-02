@@ -5,7 +5,7 @@
       "id": "minotaur", "nameKey": "monster.minotaur.name", "mythology": "greek",
       "tags": ["greek", "monster"], "role": "tank", "range": "melee", "rarity": "rare", "ai": true,
       "baseStats": {"hp": 1000, "atk": 70, "def": 50, "spd": 35},
-      "skills": [{"id": "charge", "nameKey": "skill.charge.name", "descKey": "skill.charge.desc"}]
+      "skills": [{"id": "charge", "nameKey": "skill.charge.name", "descKey": "skill.charge.desc", "type": "stun", "duration": 1, "cooldown": 3}]
     },
     {
       "id": "shadow_jackal", "nameKey": "monster.shadow_jackal.name", "mythology": "egyptian",
@@ -17,7 +17,7 @@
       "id": "fenrir", "nameKey": "monster.fenrir.name", "mythology": "norse",
       "tags": ["norse", "monster"], "role": "dps", "range": "melee", "rarity": "epic", "ai": true,
       "baseStats": {"hp": 1100, "atk": 95, "def": 45, "spd": 58},
-      "skills": [{"id": "howl", "nameKey": "skill.howl.name", "descKey": "skill.howl.desc"}]
+      "skills": [{"id": "howl", "nameKey": "skill.howl.name", "descKey": "skill.howl.desc", "type": "buff_atk", "power": 0.3, "duration": 3, "cooldown": 4}]
     }
   ]
 }

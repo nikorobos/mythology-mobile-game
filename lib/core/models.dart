@@ -6,9 +6,21 @@ enum Range { melee, ranged }
 
 enum Rarity { common, rare, epic, legendary }
 
+enum SkillType { none, damageMulti, heal, taunt, stun, buffAtk }
+
 T _enumByName<T extends Enum>(List<T> values, String name) =>
     values.firstWhere((v) => v.name == name,
         orElse: () => throw FormatException('Unknown value "$name" for $T'));
+
+SkillType _skillType(String? name) => switch (name) {
+      null => SkillType.none,
+      'damage_multi' => SkillType.damageMulti,
+      'heal' => SkillType.heal,
+      'taunt' => SkillType.taunt,
+      'stun' => SkillType.stun,
+      'buff_atk' => SkillType.buffAtk,
+      _ => throw FormatException('Unknown skill type "$name"'),
+    };
 
 class Stats {
   const Stats({
@@ -31,17 +43,39 @@ class Stats {
       );
 }
 
+/// Data-driven skill. Meaning of [power] depends on [type]:
+/// damageMulti = ATK multiplier per hit, heal = fraction of target max HP,
+/// buffAtk = ATK bonus fraction. [duration] is in the owner's turns.
 class Skill {
-  const Skill({required this.id, required this.nameKey, required this.descKey});
+  const Skill({
+    required this.id,
+    required this.nameKey,
+    required this.descKey,
+    this.type = SkillType.none,
+    this.power = 1.0,
+    this.hits = 1,
+    this.duration = 1,
+    this.cooldown = 3,
+  });
 
   final String id;
   final String nameKey;
   final String descKey;
+  final SkillType type;
+  final double power;
+  final int hits;
+  final int duration;
+  final int cooldown;
 
   factory Skill.fromJson(Map<String, dynamic> json) => Skill(
         id: json['id'] as String,
         nameKey: json['nameKey'] as String,
         descKey: json['descKey'] as String,
+        type: _skillType(json['type'] as String?),
+        power: (json['power'] as num?)?.toDouble() ?? 1.0,
+        hits: (json['hits'] as int?) ?? 1,
+        duration: (json['duration'] as int?) ?? 1,
+        cooldown: (json['cooldown'] as int?) ?? 3,
       );
 }
 

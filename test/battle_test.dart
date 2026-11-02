@@ -56,6 +56,62 @@ void main() {
     }
   });
 
+  test('prototype fight uses taunt and stun skills', () {
+    final r = simulateBattle(heroes, monsters);
+    expect(r.events.any((e) => e.kind == EventKind.taunt), isTrue);
+    expect(r.events.any((e) => e.kind == EventKind.stun), isTrue);
+    expect(r.events.any((e) => e.kind == EventKind.skip), isTrue);
+  });
+
+  Unit mk(String id, Range range, int hp, int atk, int spd, List<Skill> skills) =>
+      Unit(
+        id: id,
+        nameKey: id,
+        mythology: 'test',
+        tags: const [],
+        role: Role.dps,
+        range: range,
+        rarity: Rarity.common,
+        baseStats: Stats(hp: hp, atk: atk, def: 0, spd: spd),
+        skills: skills,
+      );
+
+  test('heal restores missing HP only', () {
+    final healer = mk('healer', Range.ranged, 100, 1, 100, const [
+      Skill(
+          id: 'h',
+          nameKey: 'h',
+          descKey: 'h',
+          type: SkillType.heal,
+          power: 0.25,
+          cooldown: 3)
+    ]);
+    final tank = mk('tank', Range.melee, 100, 1, 50, const []);
+    final foe = mk('foe', Range.melee, 1000, 10, 1, const []);
+    final r = simulateBattle([healer, tank], [foe], maxRounds: 2);
+    final heals = r.events.where((e) => e.kind == EventKind.heal).toList();
+    expect(heals.length, 1);
+    expect(heals.first.amount, 10);
+    expect(heals.first.targetHpAfter, 100);
+  });
+
+  test('stun makes the target skip its next turn', () {
+    final stunner = mk('stunner', Range.melee, 1000, 10, 100, const [
+      Skill(
+          id: 's',
+          nameKey: 's',
+          descKey: 's',
+          type: SkillType.stun,
+          duration: 1,
+          cooldown: 3)
+    ]);
+    final foe = mk('foe', Range.melee, 1000, 10, 1, const []);
+    final r = simulateBattle([stunner], [foe], maxRounds: 1);
+    final skip = r.events.where((e) => e.kind == EventKind.skip).toList();
+    expect(skip.length, 1);
+    expect(skip.first.actorIndex, 1);
+  });
+
   test('stronger side wins', () {
     final r = simulateBattle(heroes, [monsters[1]]);
     expect(r.winner, Side.heroes);

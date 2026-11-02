@@ -11,6 +11,8 @@ const _panel = Color(0xFF1D1A3D);
 const _gold = Color(0xFFF2C14E);
 const _cream = Color(0xFFF3EEDC);
 const _muted = Color(0xFFB9B4D6);
+const _red = Color(0xFFFF5C5C);
+const _green = Color(0xFF5FD38D);
 
 Color roleColor(Role r) => switch (r) {
       Role.tank => const Color(0xFF6FA8FF),
@@ -36,12 +38,14 @@ class BattleScreen extends StatefulWidget {
 }
 
 class _BattleScreenState extends State<BattleScreen> {
-  static const _step = Duration(milliseconds: 450);
+  static const _baseStep = Duration(milliseconds: 450);
+  static const _speeds = [1, 2, 4];
 
   late BattleResult _result;
   late List<int> _hp;
   Timer? _timer;
   int _next = 0;
+  int _speedIndex = 0;
   BattleEvent? _current;
 
   List<Unit> get _units => [...widget.heroes, ...widget.enemies];
@@ -52,13 +56,20 @@ class _BattleScreenState extends State<BattleScreen> {
     _start();
   }
 
-  void _start() {
+  void _startTimer() {
     _timer?.cancel();
+    _timer = Timer.periodic(
+      Duration(milliseconds: _baseStep.inMilliseconds ~/ _speeds[_speedIndex]),
+      (_) => _advance(),
+    );
+  }
+
+  void _start() {
     _result = simulateBattle(widget.heroes, widget.enemies);
     _hp = [for (final u in _units) u.baseStats.hp];
     _next = 0;
     _current = null;
-    _timer = Timer.periodic(_step, (_) => _advance());
+    _startTimer();
   }
 
   void _advance() {
@@ -72,6 +83,11 @@ class _BattleScreenState extends State<BattleScreen> {
       _hp[e.targetIndex] = e.targetHpAfter;
       _current = e;
     });
+  }
+
+  void _cycleSpeed() {
+    setState(() => _speedIndex = (_speedIndex + 1) % _speeds.length);
+    if (!_finished) _startTimer();
   }
 
   @override
@@ -91,6 +107,28 @@ class _BattleScreenState extends State<BattleScreen> {
     };
   }
 
+  String get _banner {
+    final e = _current;
+    if (e == null) return '';
+    final s = widget.strings;
+    final round = '${s.t('ui.round')} ${e.round}';
+    if (e.skillId == null) return round;
+    return '$round  -  ${s.t('skill.${e.skillId}.name')}';
+  }
+
+  /// Floating text and colour on the card that receives the event.
+  (String, Color)? _floating(BattleEvent e) {
+    final s = widget.strings;
+    return switch (e.kind) {
+      EventKind.attack => ('-${e.amount}', _red),
+      EventKind.heal => ('+${e.amount}', _green),
+      EventKind.stun => (s.t('status.stun'), _gold),
+      EventKind.skip => (s.t('status.skip'), _gold),
+      EventKind.taunt => (s.t('status.taunt'), _gold),
+      EventKind.buff => (s.t('status.buff'), _gold),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final hCount = widget.heroes.length;
@@ -100,6 +138,14 @@ class _BattleScreenState extends State<BattleScreen> {
         backgroundColor: _bg,
         foregroundColor: _cream,
         title: Text(widget.strings.t('ui.battle')),
+        actions: [
+          TextButton(
+            onPressed: _cycleSpeed,
+            child: Text('${_speeds[_speedIndex]}x',
+                style: const TextStyle(
+                    color: _gold, fontWeight: FontWeight.w900, fontSize: 18)),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -109,22 +155,13 @@ class _BattleScreenState extends State<BattleScreen> {
               height: 72,
               child: Center(
                 child: _finished
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(_outcome,
-                              style: const TextStyle(
-                                  color: _gold,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w900)),
-                        ],
-                      )
-                    : Text(
-                        _current == null
-                            ? ''
-                            : '${widget.strings.t('ui.round')} ${_current!.round}',
-                        style: const TextStyle(color: _muted, fontSize: 16),
-                      ),
+                    ? Text(_outcome,
+                        style: const TextStyle(
+                            color: _gold,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900))
+                    : Text(_banner,
+                        style: const TextStyle(color: _muted, fontSize: 16)),
               ),
             ),
             Expanded(child: _row(0, hCount)),
@@ -153,8 +190,7 @@ class _BattleScreenState extends State<BattleScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         children: [
-          for (var i = from; i < from + count; i++)
-            Expanded(child: _card(i)),
+          for (var i = from; i < from + count; i++) Expanded(child: _card(i)),
         ],
       ),
     );
@@ -165,8 +201,10 @@ class _BattleScreenState extends State<BattleScreen> {
     final hp = _hp[index];
     final max = unit.baseStats.hp;
     final dead = hp <= 0;
-    final acting = _current?.actorIndex == index;
-    final hit = _current?.targetIndex == index;
+    final current = _current;
+    final acting = current?.actorIndex == index;
+    final targeted = current?.targetIndex == index;
+    final float = (targeted && current != null) ? _floating(current) : null;
     return Opacity(
       opacity: dead ? 0.35 : 1,
       child: Container(
@@ -176,8 +214,8 @@ class _BattleScreenState extends State<BattleScreen> {
           color: _panel,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: hit
-                ? const Color(0xFFFF5C5C)
+            color: targeted
+                ? (float?.$2 ?? _red)
                 : acting
                     ? _gold
                     : const Color(0xFF1B1030),
@@ -212,7 +250,7 @@ class _BattleScreenState extends State<BattleScreen> {
               child: LinearProgressIndicator(
                 value: (hp / max).clamp(0.0, 1.0),
                 minHeight: 8,
-                color: const Color(0xFF5FD38D),
+                color: _green,
                 backgroundColor: const Color(0xFF3A3466),
               ),
             ),
@@ -221,12 +259,13 @@ class _BattleScreenState extends State<BattleScreen> {
                 style: const TextStyle(color: _muted, fontSize: 11)),
             SizedBox(
               height: 18,
-              child: hit
-                  ? Text('-${_current!.damage}',
-                      style: const TextStyle(
-                          color: Color(0xFFFF5C5C),
-                          fontWeight: FontWeight.w900))
-                  : null,
+              child: float == null
+                  ? null
+                  : FittedBox(
+                      child: Text(float.$1,
+                          style: TextStyle(
+                              color: float.$2, fontWeight: FontWeight.w900)),
+                    ),
             ),
           ],
         ),
