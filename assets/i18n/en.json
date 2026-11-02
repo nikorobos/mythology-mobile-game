@@ -99,5 +99,14 @@
   "myth.greek": "Greek",
   "myth.norse": "Norse",
   "myth.egyptian": "Egyptian",
-  "status.block": "BLOCKED"
+  "status.block": "BLOCKED",
+  "ui.boss": "BOSS",
+  "ui.enemies": "Enemies",
+  "chapter.twelfth_labor.title": "The Twelfth Labor",
+  "chapter.twelfth_labor.intro": "Heracles' final labor was to descend into the Underworld and bring back Cerberus, the three-headed hound that guards its gates.",
+  "chapter.ragnarok.title": "Ragnarok: The Wolf Breaks Free",
+  "chapter.ragnarok.intro": "In Norse myth, Ragnarok is the end of the world, when the wolf Fenrir breaks his chains and battles the gods.",
+  "chapter.weighing_heart.title": "The Weighing of the Heart",
+  "chapter.weighing_heart.intro": "In Egyptian belief, the heart of the dead was weighed against the feather of Ma'at. Ammit devoured the hearts of those found unworthy.",
+  "ui.chapter": "Chapter"
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'models.dart';
+import 'stages.dart';
 
 /// Parses a JSON document of the form {"units": [ ... ]}.
 /// Pure Dart: the Flutter layer loads the asset string and passes it here.
@@ -17,11 +18,6 @@ Map<String, String> parseStrings(String jsonText) {
   return root.map((k, v) => MapEntry(k, v as String));
 }
 
-/// Parses {"stages": [ ... ]}.
-List<StageDef> parseStages(String jsonText) {
-  final root = jsonDecode(jsonText) as Map<String, dynamic>;
-  return [
-    for (final s in root['stages'] as List)
-      StageDef.fromJson(s as Map<String, dynamic>)
-  ];
-}
+/// Parses the endless-stage settings (assets/data/stages.json).
+StageConfig parseStageConfig(String jsonText) =>
+    StageConfig.fromJson(jsonDecode(jsonText) as Map<String, dynamic>);

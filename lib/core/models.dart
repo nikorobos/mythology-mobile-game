@@ -167,25 +167,3 @@ class Unit {
         ai: (json['ai'] as bool?) ?? false,
       );
 }
-
-/// One stage: enemy unit ids (may repeat) and difficulty multipliers.
-class StageDef {
-  const StageDef({
-    required this.id,
-    required this.enemies,
-    this.hpMult = 1.0,
-    this.atkMult = 1.0,
-  });
-
-  final String id;
-  final List<String> enemies;
-  final double hpMult;
-  final double atkMult;
-
-  factory StageDef.fromJson(Map<String, dynamic> json) => StageDef(
-        id: json['id'] as String,
-        enemies: List<String>.from(json['enemies'] as List),
-        hpMult: (json['hpMult'] as num?)?.toDouble() ?? 1.0,
-        atkMult: (json['atkMult'] as num?)?.toDouble() ?? 1.0,
-      );
-}

@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:theomyth/core/battle.dart';
 import 'package:theomyth/core/content.dart';
 import 'package:theomyth/core/models.dart';
-import 'package:theomyth/game_content.dart';
+import 'package:theomyth/core/stages.dart';
 
 void main() {
   final heroes = parseUnits(File('assets/data/heroes.json').readAsStringSync());
@@ -221,14 +221,41 @@ void main() {
     expect(foeAttacks.first.skillId, isNull);
   });
 
-  test('stages reference existing monsters and scale them', () {
-    final stages =
-        parseStages(File('assets/data/stages.json').readAsStringSync());
-    expect(stages, isNotEmpty);
-    for (final st in stages) {
-      final enemies = enemiesFor(monsters, st);
-      expect(enemies.length, st.enemies.length);
+  test('endless stages: chapters, growth and bosses work', () {
+    final cfg =
+        parseStageConfig(File('assets/data/stages.json').readAsStringSync());
+    final en = parseStrings(File('assets/i18n/en.json').readAsStringSync());
+    final el = parseStrings(File('assets/i18n/el.json').readAsStringSync());
+    for (final ch in cfg.chapters) {
+      for (final id in [...ch.pool, ch.boss]) {
+        expect(monsters.any((m) => m.id == id), isTrue, reason: id);
+      }
+      for (final key in [ch.titleKey, ch.introKey]) {
+        expect(en.containsKey(key), isTrue, reason: key);
+        expect(el.containsKey(key), isTrue, reason: key);
+      }
     }
+    final s1 = buildStage(1, monsters, cfg);
+    final s7 = buildStage(7, monsters, cfg);
+    expect(s1.length, 2);
+    expect(s7.length, 5);
+    final base = monsters.firstWhere((m) => m.id == s7.first.id);
+    expect(s7.first.baseStats.hp > base.baseStats.hp, isTrue);
+    expect(isBossStage(10, cfg), isTrue);
+    expect(isBossStage(9, cfg), isFalse);
+    final boss = buildStage(10, monsters, cfg);
+    expect(boss.length, 5);
+    expect(boss.first.id, cfg.chapters.first.boss);
+    expect(boss.first.baseStats.hp > boss[1].baseStats.hp, isTrue);
+    // Chapter 2 starts at stage 11 and loops back after the last chapter.
+    expect(chapterAt(11, cfg).id, cfg.chapters[1].id);
+    expect(chapterAt(1 + 10 * cfg.chapters.length, cfg).id, cfg.chapters[0].id);
+    // Far-away stages must not crash or overflow.
+    expect(buildStage(100000, monsters, cfg).length, 5);
+    expect(() => buildStage(0, monsters, cfg), throwsArgumentError);
+  });
+
+  test('scaled copies stats', () {
     final scaled = monsters.first.scaled(hp: 2.0, atk: 0.5);
     expect(scaled.baseStats.hp, monsters.first.baseStats.hp * 2);
     expect(scaled.baseStats.atk, (monsters.first.baseStats.atk * 0.5).round());

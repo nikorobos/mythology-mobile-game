@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/stages.dart';
 import '../game_content.dart';
 import 'battle_screen.dart';
 
@@ -22,7 +23,7 @@ class _SquadScreenState extends State<SquadScreen> {
   // Default squad: the first three heroes.
   late final Set<String> _selected =
       widget.content.heroes.take(3).map((h) => h.id).toSet();
-  int _stage = 0;
+  int _stage = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -99,21 +100,52 @@ class _SquadScreenState extends State<SquadScreen> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: Row(
+              child: Column(
                 children: [
-                  Text('${s.t('ui.stage')}:',
-                      style: const TextStyle(color: _cream)),
-                  const SizedBox(width: 12),
-                  for (var i = 0; i < c.stages.length; i++)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text('${i + 1}'),
-                        selected: _stage == i,
-                        selectedColor: _gold,
-                        onSelected: (_) => setState(() => _stage = i),
+                  Text(
+                    '${s.t('ui.chapter')} ${chapterNumber(_stage, c.stageConfig)}: '
+                    '${s.t(chapterAt(_stage, c.stageConfig).titleKey)}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: _gold, fontWeight: FontWeight.w800),
+                  ),
+                  Text(
+                    s.t(chapterAt(_stage, c.stageConfig).introKey),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: _muted, fontSize: 12),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed:
+                            _stage > 1 ? () => setState(() => _stage--) : null,
+                        icon: const Icon(Icons.remove_circle_outline),
+                        color: _gold,
                       ),
-                    ),
+                      Text(
+                        '${s.t('ui.stage')} $_stage'
+                        '${c.isBoss(_stage) ? '  -  ${s.t('ui.boss')}' : ''}',
+                        style: const TextStyle(
+                            color: _cream,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800),
+                      ),
+                      IconButton(
+                        onPressed: () => setState(() => _stage++),
+                        icon: const Icon(Icons.add_circle_outline),
+                        color: _gold,
+                      ),
+                    ],
+                  ),
+                  Text(
+                    c
+                        .enemiesForStage(_stage)
+                        .map((u) => s.t(u.nameKey))
+                        .join(', '),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: _muted, fontSize: 12),
+                  ),
                 ],
               ),
             ),
