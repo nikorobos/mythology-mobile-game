@@ -4,14 +4,18 @@ import 'package:flutter/material.dart';
 
 import '../core/format.dart';
 import '../game_content.dart';
+import 'theme.dart';
+import 'widgets.dart';
 
-const _bg = Color(0xFF14122B);
-const _panel = Color(0xFF1D1A3D);
-const _gold = Color(0xFFF2C14E);
-const _cream = Color(0xFFF3EEDC);
-const _muted = Color(0xFFB9B4D6);
+/// "2h 14m" from minutes.
+String formatMinutes(int minutes) {
+  final h = minutes ~/ 60;
+  final m = minutes % 60;
+  return h > 0 ? '${h}h ${m}m' : '${m}m';
+}
 
-/// Shows gold that piled up while away, with Collect and Collect x2 (ad).
+/// Idle rewards strip (board: Home). Gold that piled up while away, with
+/// Collect and Collect x2 (the ad service is still a PLACEHOLDER).
 class IdlePanel extends StatefulWidget {
   const IdlePanel({super.key, required this.session});
 
@@ -53,6 +57,7 @@ class _IdlePanelState extends State<IdlePanel> {
   @override
   Widget build(BuildContext context) {
     final player = widget.session.player;
+    final eco = widget.session.content.economy;
     final s = widget.session.content.strings;
     return ListenableBuilder(
       listenable: player,
@@ -60,68 +65,110 @@ class _IdlePanelState extends State<IdlePanel> {
         final pending = player.pendingIdle();
         final cap = player.maxIdleGold;
         final full = pending >= cap;
+        final last = player.state.lastCollectMs ?? player.nowMs;
+        final away = ((player.nowMs - last) ~/ 60000).clamp(0, eco.maxIdleMinutes);
+        final canCollect = pending > 0 && !_busy;
         return Container(
-          width: 300,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
           decoration: BoxDecoration(
-            color: _panel,
-            borderRadius: BorderRadius.circular(12),
+            color: Pal.panel,
+            borderRadius: BorderRadius.circular(18),
           ),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(s.t('ui.idle'),
-                  style: const TextStyle(
-                      color: _gold, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 6),
-              Text(
-                '+${formatNumber(pending)} ${s.t('ui.gold')}'
-                '${full ? '   ${s.t('ui.idle_full')}' : ''}',
-                style: const TextStyle(
-                    color: _cream, fontSize: 20, fontWeight: FontWeight.w900),
-              ),
-              const SizedBox(height: 6),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: cap > 0 ? (pending / cap).clamp(0.0, 1.0) : 0,
-                  minHeight: 6,
-                  color: _gold,
-                  backgroundColor: const Color(0xFF3A3466),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text('max ${formatNumber(cap)}',
-                  style: const TextStyle(color: _muted, fontSize: 11)),
-              const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                          backgroundColor: _gold, foregroundColor: _bg),
-                      onPressed: pending > 0 && !_busy
-                          ? () => player.collectIdle()
-                          : null,
-                      child: Text(s.t('ui.collect')),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GoldLabel(s.t('ui.idle')),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const CoinIcon(size: 20),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                '+${formatNumber(pending)}'
+                                '${full ? '  ${s.t('ui.idle_full')}' : ''}',
+                                overflow: TextOverflow.ellipsis,
+                                style: nunito(18),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          '${formatMinutes(away)} / ${formatMinutes(eco.maxIdleMinutes)}',
+                          style: nunito(12, weight: 700, color: Pal.muted),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed:
-                          pending > 0 && !_busy ? _collectWithAd : null,
-                      child: Text(s.t('ui.collect_ad'),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 12)),
-                    ),
+                  _GreenButton(
+                    label: s.t('ui.collect'),
+                    onPressed: canCollect ? () => player.collectIdle() : null,
                   ),
                 ],
+              ),
+              const SizedBox(height: 8),
+              Bar(
+                value: cap > 0 ? pending / cap : 0,
+                color: Pal.gold,
+                height: 6,
+                track: Pal.track,
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Pal.cream,
+                    side: const BorderSide(color: Pal.green, width: 2),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: canCollect ? _collectWithAd : null,
+                  icon: const Icon(Icons.play_circle_fill,
+                      color: Pal.green, size: 22),
+                  label: Text(s.t('ui.collect_ad'), style: nunito(13)),
+                ),
               ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+class _GreenButton extends StatelessWidget {
+  const _GreenButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: onPressed == null ? 0.45 : 1,
+      child: Material(
+        color: Pal.green,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onPressed,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 44, minWidth: 88),
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            alignment: Alignment.center,
+            child: Text(label, style: nunito(14, color: Pal.bg)),
+          ),
+        ),
+      ),
     );
   }
 }

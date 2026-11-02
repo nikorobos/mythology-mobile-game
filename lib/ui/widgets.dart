@@ -609,3 +609,15 @@ class TabHeader extends StatelessWidget {
     );
   }
 }
+
+/// Small gold uppercase section label ("YOUR SQUAD").
+class GoldLabel extends StatelessWidget {
+  const GoldLabel(this.text, {super.key, this.color = Pal.gold});
+
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) =>
+      Text(text.toUpperCase(), style: labelStyle(color: color));
+}

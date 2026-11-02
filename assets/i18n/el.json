@@ -176,5 +176,9 @@
   "ui.nav_heroes": "Ήρωες",
   "ui.nav_summon": "Κάλεσμα",
   "ui.idle_rpg": "IDLE RPG",
-  "ui.splash_loading": "Καλούμε τους θεούς…"
+  "ui.splash_loading": "Καλούμε τους θεούς…",
+  "ui.your_squad": "Η ομάδα σου",
+  "ui.squad_pick_title": "Διάλεξε την ομάδα σου",
+  "ui.prev_stage": "Προηγούμενο στάδιο",
+  "ui.next_stage": "Επόμενο στάδιο"
 }

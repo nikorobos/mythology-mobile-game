@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../game_content.dart';
+import 'home_screen.dart';
 import 'legacy_tabs.dart';
+import 'squad_model.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -19,6 +21,7 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _tab = 0;
+  late final SquadModel _squad = SquadModel(widget.session);
 
   void goTab(int i) => setState(() => _tab = i);
 
@@ -31,7 +34,7 @@ class _AppShellState extends State<AppShell> {
         index: _tab,
         children: [
           // Replaced by the board-styled screens in the next stages.
-          LegacyHomeTab(session: widget.session),
+          HomeScreen(session: widget.session, squad: _squad),
           LegacyHeroesTab(session: widget.session),
           LegacySummonTab(session: widget.session),
         ],

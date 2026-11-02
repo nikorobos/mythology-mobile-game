@@ -31,11 +31,15 @@ class BattleScreen extends StatefulWidget {
     required this.enemies,
     required this.strings,
     required this.onFinished,
+    this.stage,
   });
 
   final List<Unit> heroes;
   final List<Unit> enemies;
   final Strings strings;
+
+  /// Stage number shown in the title (null = just "Battle").
+  final int? stage;
 
   /// Called once per finished fight; returns the rewards earned.
   final BattleReward Function(bool won) onFinished;
