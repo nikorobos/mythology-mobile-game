@@ -250,8 +250,8 @@ class _Scene extends StatelessWidget {
     Widget bust(int i, double size, double shift) => i < squadUnits.length
         ? Transform.translate(
             offset: Offset(shift, 0),
-            child: HeroBust(unit: squadUnits[i], size: size))
-        : SizedBox(width: size, height: size);
+            child: UnitSprite(unit: squadUnits[i], height: size))
+        : SizedBox(width: size * 0.75, height: size);
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: Container(
@@ -292,14 +292,14 @@ class _Scene extends StatelessWidget {
             Positioned(
               left: 0,
               right: 0,
-              bottom: 52,
+              bottom: 46,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  bust(1, 96, 14),
-                  bust(0, 120, 0),
-                  bust(2, 96, -14),
+                  bust(1, 128, 22),
+                  bust(0, 156, 0),
+                  bust(2, 128, -22),
                 ],
               ),
             ),

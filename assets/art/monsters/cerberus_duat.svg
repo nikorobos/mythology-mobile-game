@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320"><g stroke="#1B1030" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+<rect x="62" y="250" width="26" height="38" rx="9" fill="#2B2B3F" /><rect x="152" y="250" width="26" height="38" rx="9" fill="#2B2B3F" />
+<ellipse cx="120" cy="226" rx="72" ry="50" fill="#2B2B3F" />
+<rect x="94" y="258" width="26" height="32" rx="9" fill="#3A3A52" /><rect x="122" y="258" width="26" height="32" rx="9" fill="#3A3A52" />
+<g transform="translate(60 150) scale(0.95)">
+<polygon points="-18,-14 -22,-46 -6,-24" fill="#2B2B3F" /><polygon points="18,-14 22,-46 6,-24" fill="#2B2B3F" />
+<circle r="20" fill="#3A3A52" /><ellipse cx="0" cy="12" rx="11" ry="13" fill="#6B6B88" />
+<circle cx="0" cy="18" r="4" fill="#14122B" stroke="none" />
+<circle cx="-8" cy="-4" r="3.5" fill="#5BFFE0" stroke-width="2" /><circle cx="8" cy="-4" r="3.5" fill="#5BFFE0" stroke-width="2" />
+<path d="M-18 26 Q0 38 18 26" fill="none" stroke="#F2C14E" stroke-width="6" />
+</g>
+<g transform="translate(180 150) scale(0.95)">
+<polygon points="-18,-14 -22,-46 -6,-24" fill="#2B2B3F" /><polygon points="18,-14 22,-46 6,-24" fill="#2B2B3F" />
+<circle r="20" fill="#3A3A52" /><ellipse cx="0" cy="12" rx="11" ry="13" fill="#6B6B88" />
+<circle cx="0" cy="18" r="4" fill="#14122B" stroke="none" />
+<circle cx="-8" cy="-4" r="3.5" fill="#5BFFE0" stroke-width="2" /><circle cx="8" cy="-4" r="3.5" fill="#5BFFE0" stroke-width="2" />
+<path d="M-18 26 Q0 38 18 26" fill="none" stroke="#F2C14E" stroke-width="6" />
+</g>
+<g transform="translate(120 112) scale(1.3)">
+<polygon points="-18,-14 -22,-46 -6,-24" fill="#2B2B3F" /><polygon points="18,-14 22,-46 6,-24" fill="#2B2B3F" />
+<circle r="20" fill="#3A3A52" /><ellipse cx="0" cy="12" rx="11" ry="13" fill="#6B6B88" />
+<circle cx="0" cy="18" r="4" fill="#14122B" stroke="none" />
+<circle cx="-8" cy="-4" r="3.5" fill="#5BFFE0" stroke-width="2" /><circle cx="8" cy="-4" r="3.5" fill="#5BFFE0" stroke-width="2" />
+<path d="M-18 26 Q0 38 18 26" fill="none" stroke="#F2C14E" stroke-width="5" />
+</g>
+<path d="M92 190 Q120 206 148 190" fill="none" stroke="#F2C14E" stroke-width="6" />
+</g></svg>

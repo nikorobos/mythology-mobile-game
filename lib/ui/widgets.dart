@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../core/models.dart';
+import 'art.dart';
 import 'theme.dart';
 
 /// Shared building blocks for the board-styled screens.
@@ -284,6 +286,25 @@ class HeroBust extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final asset = artAssetFor(unit);
+    if (asset != null) {
+      // Board art, cropped to head and shoulders.
+      return ExcludeSemantics(
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: ClipRect(
+            child: Transform.scale(
+              scale: 2.0,
+              alignment: const Alignment(0, -0.38),
+              child: Center(
+                child: SvgPicture.asset(asset, height: size, fit: BoxFit.contain),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     final cloth = mythColors(unit.mythology).$1;
     return ExcludeSemantics(
       child: CustomPaint(
@@ -291,6 +312,28 @@ class HeroBust extends StatelessWidget {
         painter: _BustPainter(_seedOf(unit.id), cloth),
       ),
     );
+  }
+}
+
+/// Full-body sprite of a hero or monster, [height] tall (art is 3:4).
+/// Uses the board SVG; units without art get the generic placeholder.
+class UnitSprite extends StatelessWidget {
+  const UnitSprite({super.key, required this.unit, this.height = 120});
+
+  final Unit unit;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = artAssetFor(unit);
+    if (asset != null) {
+      return ExcludeSemantics(
+        child: SvgPicture.asset(asset, height: height, fit: BoxFit.contain),
+      );
+    }
+    return unit.ai
+        ? MonsterFigure(unit: unit, size: height * 0.8)
+        : HeroBust(unit: unit, size: height * 0.8);
   }
 }
 

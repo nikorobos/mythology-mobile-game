@@ -238,7 +238,7 @@ class HeroDetailScreen extends StatelessWidget {
               left: 0,
               right: 0,
               bottom: 0,
-              child: Center(child: HeroBust(unit: hero, size: 210)),
+              child: Center(child: UnitSprite(unit: hero, height: 226)),
             ),
             Positioned(
               left: 12,
