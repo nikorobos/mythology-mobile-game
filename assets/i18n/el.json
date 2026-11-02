@@ -171,5 +171,10 @@
   "stat.hp": "HP",
   "stat.atk": "ATK",
   "stat.def": "DEF",
-  "stat.spd": "SPD"
+  "stat.spd": "SPD",
+  "ui.nav_home": "Αρχική",
+  "ui.nav_heroes": "Ήρωες",
+  "ui.nav_summon": "Κάλεσμα",
+  "ui.idle_rpg": "IDLE RPG",
+  "ui.splash_loading": "Καλούμε τους θεούς…"
 }

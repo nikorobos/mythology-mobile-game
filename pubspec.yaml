@@ -25,3 +25,16 @@ flutter:
   assets:
     - assets/data/
     - assets/i18n/
+  fonts:
+    - family: LilitaOne
+      fonts:
+        - asset: assets/fonts/LilitaOne-Regular.ttf
+    - family: CinzelDecorative
+      fonts:
+        - asset: assets/fonts/CinzelDecorative-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/CinzelDecorative-Black.ttf
+          weight: 900
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito.ttf
