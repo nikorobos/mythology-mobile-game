@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
@@ -41,11 +42,13 @@ class _BattleScreenState extends State<BattleScreen> {
   static const _baseStep = Duration(milliseconds: 450);
   static const _speeds = [1, 2, 4];
 
-  late BattleResult _result;
+  late Battle _battle;
   late List<int> _hp;
+  final Queue<BattleEvent> _pending = Queue();
   Timer? _timer;
-  int _next = 0;
   int _speedIndex = 0;
+  bool _auto = false;
+  bool _done = false;
   BattleEvent? _current;
 
   List<Unit> get _units => [...widget.heroes, ...widget.enemies];
@@ -65,20 +68,28 @@ class _BattleScreenState extends State<BattleScreen> {
   }
 
   void _start() {
-    _result = simulateBattle(widget.heroes, widget.enemies);
+    _battle = Battle(widget.heroes, widget.enemies)..auto = _auto;
     _hp = [for (final u in _units) u.baseStats.hp];
-    _next = 0;
+    _pending.clear();
     _current = null;
+    _done = false;
     _startTimer();
   }
 
   void _advance() {
-    if (_next >= _result.events.length) {
-      _timer?.cancel();
-      setState(() => _current = null);
-      return;
+    if (_pending.isEmpty) {
+      if (_battle.finished) {
+        _timer?.cancel();
+        setState(() {
+          _current = null;
+          _done = true;
+        });
+        return;
+      }
+      _pending.addAll(_battle.step());
     }
-    final e = _result.events[_next++];
+    if (_pending.isEmpty) return;
+    final e = _pending.removeFirst();
     setState(() {
       _hp[e.targetIndex] = e.targetHpAfter;
       _current = e;
@@ -87,7 +98,14 @@ class _BattleScreenState extends State<BattleScreen> {
 
   void _cycleSpeed() {
     setState(() => _speedIndex = (_speedIndex + 1) % _speeds.length);
-    if (!_finished) _startTimer();
+    if (!_done) _startTimer();
+  }
+
+  void _toggleAuto() {
+    setState(() {
+      _auto = !_auto;
+      _battle.auto = _auto;
+    });
   }
 
   @override
@@ -96,11 +114,9 @@ class _BattleScreenState extends State<BattleScreen> {
     super.dispose();
   }
 
-  bool get _finished => _next >= _result.events.length;
-
   String get _outcome {
     final s = widget.strings;
-    return switch (_result.winner) {
+    return switch (_battle.winner) {
       Side.heroes => s.t('ui.victory'),
       Side.enemies => s.t('ui.defeat'),
       null => s.t('ui.draw'),
@@ -117,7 +133,7 @@ class _BattleScreenState extends State<BattleScreen> {
   }
 
   /// Floating text and colour on the card that receives the event.
-  (String, Color)? _floating(BattleEvent e) {
+  (String, Color) _floating(BattleEvent e) {
     final s = widget.strings;
     return switch (e.kind) {
       EventKind.attack => ('-${e.amount}', _red),
@@ -132,13 +148,21 @@ class _BattleScreenState extends State<BattleScreen> {
   @override
   Widget build(BuildContext context) {
     final hCount = widget.heroes.length;
+    final s = widget.strings;
     return Scaffold(
       backgroundColor: _bg,
       appBar: AppBar(
         backgroundColor: _bg,
         foregroundColor: _cream,
-        title: Text(widget.strings.t('ui.battle')),
+        title: Text(s.t('ui.battle')),
         actions: [
+          TextButton(
+            onPressed: _toggleAuto,
+            child: Text(_auto ? s.t('ui.auto_on') : s.t('ui.auto_off'),
+                style: TextStyle(
+                    color: _auto ? _green : _muted,
+                    fontWeight: FontWeight.w900)),
+          ),
           TextButton(
             onPressed: _cycleSpeed,
             child: Text('${_speeds[_speedIndex]}x',
@@ -154,7 +178,7 @@ class _BattleScreenState extends State<BattleScreen> {
             SizedBox(
               height: 72,
               child: Center(
-                child: _finished
+                child: _done
                     ? Text(_outcome,
                         style: const TextStyle(
                             color: _gold,
@@ -173,8 +197,8 @@ class _BattleScreenState extends State<BattleScreen> {
                 child: FilledButton(
                   style: FilledButton.styleFrom(
                       backgroundColor: _gold, foregroundColor: _bg),
-                  onPressed: _finished ? () => setState(_start) : null,
-                  child: Text(widget.strings.t('ui.replay')),
+                  onPressed: _done ? () => setState(_start) : null,
+                  child: Text(s.t('ui.replay')),
                 ),
               ),
             ),
@@ -198,6 +222,7 @@ class _BattleScreenState extends State<BattleScreen> {
 
   Widget _card(int index) {
     final unit = _units[index];
+    final fighter = _battle.all[index];
     final hp = _hp[index];
     final max = unit.baseStats.hp;
     final dead = hp <= 0;
@@ -205,69 +230,96 @@ class _BattleScreenState extends State<BattleScreen> {
     final acting = current?.actorIndex == index;
     final targeted = current?.targetIndex == index;
     final float = (targeted && current != null) ? _floating(current) : null;
-    return Opacity(
-      opacity: dead ? 0.35 : 1,
-      child: Container(
-        margin: const EdgeInsets.all(4),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: _panel,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: targeted
-                ? (float?.$2 ?? _red)
-                : acting
-                    ? _gold
-                    : const Color(0xFF1B1030),
-            width: 2,
+    final isHero = index < widget.heroes.length;
+    final canCast = isHero && !dead && !_done && fighter.ultReady;
+    final queued = canCast && fighter.ultQueued;
+    return GestureDetector(
+      onTap: canCast && !_auto
+          ? () => setState(() => _battle.queueUltimate(index))
+          : null,
+      child: Opacity(
+        opacity: dead ? 0.35 : 1,
+        child: Container(
+          margin: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: _panel,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: targeted
+                  ? (float?.$2 ?? _red)
+                  : (acting || canCast)
+                      ? _gold
+                      : const Color(0xFF1B1030),
+              width: queued ? 4 : 2,
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(widget.strings.t(unit.nameKey),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    color: _cream, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: roleColor(unit.role),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(widget.strings.t('role.${unit.role.name}'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(widget.strings.t(unit.nameKey),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                      color: Color(0xFF1B1030),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800)),
-            ),
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: (hp / max).clamp(0.0, 1.0),
-                minHeight: 8,
-                color: _green,
-                backgroundColor: const Color(0xFF3A3466),
+                      color: _cream, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: roleColor(unit.role),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(widget.strings.t('role.${unit.role.name}'),
+                    style: const TextStyle(
+                        color: Color(0xFF1B1030),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800)),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text('$hp / $max',
-                style: const TextStyle(color: _muted, fontSize: 11)),
-            SizedBox(
-              height: 18,
-              child: float == null
-                  ? null
-                  : FittedBox(
-                      child: Text(float.$1,
-                          style: TextStyle(
-                              color: float.$2, fontWeight: FontWeight.w900)),
-                    ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: (hp / max).clamp(0.0, 1.0),
+                  minHeight: 8,
+                  color: _green,
+                  backgroundColor: const Color(0xFF3A3466),
+                ),
+              ),
+              const SizedBox(height: 3),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: LinearProgressIndicator(
+                  value: (fighter.energy / maxEnergy).clamp(0.0, 1.0),
+                  minHeight: 4,
+                  color: _gold,
+                  backgroundColor: const Color(0xFF3A3466),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text('$hp / $max',
+                  style: const TextStyle(color: _muted, fontSize: 11)),
+              SizedBox(
+                height: 18,
+                child: float != null
+                    ? FittedBox(
+                        child: Text(float.$1,
+                            style: TextStyle(
+                                color: float.$2,
+                                fontWeight: FontWeight.w900)),
+                      )
+                    : canCast
+                        ? Text(
+                            queued
+                                ? '${widget.strings.t('ui.ult')}!'
+                                : widget.strings.t('ui.ult'),
+                            style: const TextStyle(
+                                color: _gold, fontWeight: FontWeight.w900))
+                        : null,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -5,19 +5,22 @@
       "id": "heracles", "nameKey": "hero.heracles.name", "mythology": "greek",
       "tags": ["greek"], "role": "tank", "range": "melee", "rarity": "epic",
       "baseStats": {"hp": 1200, "atk": 60, "def": 80, "spd": 40},
-      "skills": [{"id": "nemean_guard", "nameKey": "skill.nemean_guard.name", "descKey": "skill.nemean_guard.desc", "type": "taunt", "duration": 2, "cooldown": 3}]
+      "skills": [{"id": "nemean_guard", "nameKey": "skill.nemean_guard.name", "descKey": "skill.nemean_guard.desc", "type": "taunt", "duration": 2, "cooldown": 3}],
+      "ultimate": {"id": "twelve_labors", "nameKey": "skill.twelve_labors.name", "descKey": "skill.twelve_labors.desc", "type": "damage_all", "power": 1.5}
     },
     {
       "id": "achilles", "nameKey": "hero.achilles.name", "mythology": "greek",
       "tags": ["greek"], "role": "dps", "range": "melee", "rarity": "epic",
       "baseStats": {"hp": 800, "atk": 110, "def": 40, "spd": 60},
-      "skills": [{"id": "wrath_of_troy", "nameKey": "skill.wrath_of_troy.name", "descKey": "skill.wrath_of_troy.desc", "type": "damage_multi", "hits": 3, "power": 0.6, "cooldown": 3}]
+      "skills": [{"id": "wrath_of_troy", "nameKey": "skill.wrath_of_troy.name", "descKey": "skill.wrath_of_troy.desc", "type": "damage_multi", "hits": 3, "power": 0.6, "cooldown": 3}],
+      "ultimate": {"id": "spear_of_peleus", "nameKey": "skill.spear_of_peleus.name", "descKey": "skill.spear_of_peleus.desc", "type": "damage_multi", "hits": 5, "power": 0.9}
     },
     {
       "id": "asclepius", "nameKey": "hero.asclepius.name", "mythology": "greek",
       "tags": ["greek"], "role": "healer", "range": "ranged", "rarity": "rare",
       "baseStats": {"hp": 700, "atk": 40, "def": 30, "spd": 50},
-      "skills": [{"id": "serpents_remedy", "nameKey": "skill.serpents_remedy.name", "descKey": "skill.serpents_remedy.desc", "type": "heal", "power": 0.25, "cooldown": 3}]
+      "skills": [{"id": "serpents_remedy", "nameKey": "skill.serpents_remedy.name", "descKey": "skill.serpents_remedy.desc", "type": "heal", "power": 0.25, "cooldown": 3}],
+      "ultimate": {"id": "rod_of_asclepius", "nameKey": "skill.rod_of_asclepius.name", "descKey": "skill.rod_of_asclepius.desc", "type": "heal_all", "power": 0.35}
     }
   ]
 }

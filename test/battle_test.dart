@@ -22,7 +22,7 @@ void main() {
     for (final u in [...heroes, ...monsters]) {
       expect(en.containsKey(u.nameKey), isTrue, reason: u.nameKey);
       expect(el.containsKey(u.nameKey), isTrue, reason: u.nameKey);
-      for (final s in u.skills) {
+      for (final s in [...u.skills, if (u.ultimate != null) u.ultimate!]) {
         expect(en.containsKey(s.nameKey), isTrue, reason: s.nameKey);
         expect(el.containsKey(s.nameKey), isTrue, reason: s.nameKey);
       }
@@ -63,7 +63,8 @@ void main() {
     expect(r.events.any((e) => e.kind == EventKind.skip), isTrue);
   });
 
-  Unit mk(String id, Range range, int hp, int atk, int spd, List<Skill> skills) =>
+  Unit mk(String id, Range range, int hp, int atk, int spd, List<Skill> skills,
+          {Skill? ultimate}) =>
       Unit(
         id: id,
         nameKey: id,
@@ -74,6 +75,7 @@ void main() {
         rarity: Rarity.common,
         baseStats: Stats(hp: hp, atk: atk, def: 0, spd: spd),
         skills: skills,
+        ultimate: ultimate,
       );
 
   test('heal restores missing HP only', () {
@@ -110,6 +112,48 @@ void main() {
     final skip = r.events.where((e) => e.kind == EventKind.skip).toList();
     expect(skip.length, 1);
     expect(skip.first.actorIndex, 1);
+  });
+
+  group('ultimate', () {
+    const ult = Skill(
+        id: 'u',
+        nameKey: 'u',
+        descKey: 'u',
+        type: SkillType.damageAll,
+        power: 1.0);
+    Unit hero() => mk('hero', Range.melee, 100000, 1, 100, const [],
+        ultimate: ult);
+    Unit foe() => mk('foe', Range.melee, 100000, 1, 1, const []);
+
+    Battle run(void Function(Battle) setup) {
+      final b = Battle([hero()], [foe()], maxRounds: 6);
+      setup(b);
+      while (!b.finished) {
+        b.step();
+      }
+      return b;
+    }
+
+    test('AUTO casts when energy is full (round 4)', () {
+      final b = run((b) => b.auto = true);
+      final casts = b.events.where((e) => e.skillId == 'u').toList();
+      expect(casts, isNotEmpty);
+      expect(casts.first.round, 4);
+    });
+
+    test('manual mode does not cast until queued', () {
+      final b = run((b) => b.auto = false);
+      expect(b.events.any((e) => e.skillId == 'u'), isFalse);
+    });
+
+    test('queued ultimate casts once energy is full', () {
+      final b = run((b) {
+        b.auto = false;
+        b.queueUltimate(0);
+      });
+      final casts = b.events.where((e) => e.skillId == 'u').toList();
+      expect(casts.first.round, 4);
+    });
   });
 
   test('stronger side wins', () {

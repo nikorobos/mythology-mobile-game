@@ -1,6 +1,8 @@
 // Pure Dart auto-battle core. No Flutter or Flame imports.
 // Prototype rules (placeholder balance): speed order, one action per turn.
-// A ready skill is used instead of a basic attack. Ultimates come later.
+// A ready skill is used instead of a basic attack. Energy fills from acting
+// and from taking hits; at full energy the ultimate is cast (enemies and
+// AUTO mode cast on their own, otherwise the player queues it).
 
 import 'dart:math' show max, min;
 
@@ -9,6 +11,10 @@ import 'models.dart';
 enum Side { heroes, enemies }
 
 enum EventKind { attack, heal, stun, skip, taunt, buff }
+
+const int maxEnergy = 100;
+const int _energyPerAction = 25;
+const int _energyPerHit = 15;
 
 class Combatant {
   Combatant(this.unit, this.side)
@@ -19,12 +25,16 @@ class Combatant {
   final Side side;
   final Map<String, int> cooldowns;
   int hp;
+  int energy = 0;
+  bool ultQueued = false;
   int stunTurns = 0;
   int tauntTurns = 0;
   int buffTurns = 0;
   double buffPct = 0;
 
   bool get alive => hp > 0;
+
+  bool get ultReady => unit.ultimate != null && energy >= maxEnergy;
 
   int get atk =>
       (unit.baseStats.atk * (1 + (buffTurns > 0 ? buffPct : 0))).round();
@@ -82,22 +92,80 @@ Combatant? pickTarget(List<Combatant> targets) {
   return front.isNotEmpty ? front.first : alive.first;
 }
 
-/// Deterministic: same input always gives the same result.
-BattleResult simulateBattle(
-  List<Unit> heroes,
-  List<Unit> enemies, {
-  int maxRounds = 50,
-}) {
-  final hs = [for (final u in heroes) Combatant(u, Side.heroes)];
-  final es = [for (final u in enemies) Combatant(u, Side.enemies)];
-  final all = [...hs, ...es];
-  final log = <String>[];
-  final events = <BattleEvent>[];
-  var round = 0;
+/// Steppable battle. Call [step] to run one actor's action and get the events
+/// it produced. Deterministic for the same units and the same player input.
+class Battle {
+  Battle(List<Unit> heroes, List<Unit> enemies, {this.maxRounds = 50})
+      : hs = [for (final u in heroes) Combatant(u, Side.heroes)],
+        es = [for (final u in enemies) Combatant(u, Side.enemies)] {
+    all = [...hs, ...es];
+  }
 
-  bool sideAlive(List<Combatant> s) => s.any((c) => c.alive);
+  final int maxRounds;
+  final List<Combatant> hs;
+  final List<Combatant> es;
+  late final List<Combatant> all;
 
-  void emit(EventKind kind, Combatant actor, Combatant target, int amount,
+  /// AUTO mode: heroes cast their ultimate as soon as energy is full.
+  bool auto = false;
+
+  final List<String> log = [];
+  final List<BattleEvent> events = [];
+  int round = 0;
+
+  List<Combatant> _queue = [];
+  int _cursor = 0;
+
+  bool _sideAlive(List<Combatant> s) => s.any((c) => c.alive);
+
+  bool get finished =>
+      !_sideAlive(hs) ||
+      !_sideAlive(es) ||
+      (round >= maxRounds && _cursor >= _queue.length);
+
+  Side? get winner => !_sideAlive(es) && _sideAlive(hs)
+      ? Side.heroes
+      : !_sideAlive(hs) && _sideAlive(es)
+          ? Side.enemies
+          : null;
+
+  BattleResult get result => BattleResult(
+        winner: winner,
+        rounds: round,
+        log: log,
+        events: events,
+      );
+
+  /// Marks a hero's ultimate to be cast on its next turn with full energy.
+  void queueUltimate(int index) {
+    if (index < 0 || index >= hs.length) return;
+    final c = all[index];
+    if (c.alive && c.unit.ultimate != null) c.ultQueued = true;
+  }
+
+  /// Runs the next action. Returns the events it produced (empty if finished).
+  List<BattleEvent> step() {
+    final start = events.length;
+    while (!finished && events.length == start) {
+      if (_cursor >= _queue.length) {
+        round++;
+        // Stable sort: higher speed first, ties keep list order (heroes first).
+        _queue = [...all]..sort((a, b) {
+            final bySpd = b.unit.baseStats.spd.compareTo(a.unit.baseStats.spd);
+            return bySpd != 0
+                ? bySpd
+                : all.indexOf(a).compareTo(all.indexOf(b));
+          });
+        _cursor = 0;
+      }
+      final actor = _queue[_cursor++];
+      if (!actor.alive) continue;
+      _act(actor);
+    }
+    return events.sublist(start);
+  }
+
+  void _emit(EventKind kind, Combatant actor, Combatant target, int amount,
       {String? skillId}) {
     events.add(BattleEvent(
       round: round,
@@ -113,14 +181,69 @@ BattleResult simulateBattle(
         '$amount (hp ${target.hp})');
   }
 
-  void hit(Combatant actor, Combatant target, int atk, {String? skillId}) {
+  void _hit(Combatant actor, Combatant target, int atk, {String? skillId}) {
     final dmg = calcDamage(atk, target.unit.baseStats.def);
     target.hp = max(0, target.hp - dmg);
-    emit(EventKind.attack, actor, target, dmg, skillId: skillId);
+    if (target.alive) {
+      target.energy = min(maxEnergy, target.energy + _energyPerHit);
+    }
+    _emit(EventKind.attack, actor, target, dmg, skillId: skillId);
   }
 
-  /// Returns true if the skill was used (so it goes on cooldown).
-  bool useSkill(Combatant actor, Skill skill, List<Combatant> allies,
+  int _heal(Combatant actor, Combatant target, double fraction,
+      {String? skillId}) {
+    final maxHp = target.unit.baseStats.hp;
+    final amount = min(maxHp - target.hp, (maxHp * fraction).round());
+    target.hp += amount;
+    _emit(EventKind.heal, actor, target, amount, skillId: skillId);
+    return amount;
+  }
+
+  void _act(Combatant actor) {
+    final allies = actor.side == Side.heroes ? hs : es;
+    final foes = actor.side == Side.heroes ? es : hs;
+
+    // Start of own turn: tick timers.
+    actor.cooldowns.updateAll((_, v) => v > 0 ? v - 1 : 0);
+    if (actor.tauntTurns > 0) actor.tauntTurns--;
+    if (actor.buffTurns > 0) actor.buffTurns--;
+
+    if (actor.stunTurns > 0) {
+      actor.stunTurns--;
+      _emit(EventKind.skip, actor, actor, 0);
+      return;
+    }
+
+    final ult = actor.unit.ultimate;
+    if (ult != null &&
+        actor.energy >= maxEnergy &&
+        (actor.side == Side.enemies || auto || actor.ultQueued)) {
+      if (_useSkill(actor, ult, allies, foes)) {
+        actor.energy = 0;
+        actor.ultQueued = false;
+        return;
+      }
+    }
+
+    var acted = false;
+    for (final skill in actor.unit.skills) {
+      if ((actor.cooldowns[skill.id] ?? 0) > 0) continue;
+      if (_useSkill(actor, skill, allies, foes)) {
+        actor.cooldowns[skill.id] = skill.cooldown;
+        acted = true;
+        break;
+      }
+    }
+    if (!acted) {
+      final target = pickTarget(foes);
+      if (target == null) return;
+      _hit(actor, target, actor.atk);
+    }
+    actor.energy = min(maxEnergy, actor.energy + _energyPerAction);
+  }
+
+  /// Returns true if the skill was used.
+  bool _useSkill(Combatant actor, Skill skill, List<Combatant> allies,
       List<Combatant> foes) {
     switch (skill.type) {
       case SkillType.none:
@@ -134,7 +257,15 @@ BattleResult simulateBattle(
         }
         final atk = (actor.atk * skill.power).round();
         for (var i = 0; i < skill.hits && target.alive; i++) {
-          hit(actor, target, atk, skillId: skill.id);
+          _hit(actor, target, atk, skillId: skill.id);
+        }
+        return true;
+      case SkillType.damageAll:
+        final alive = foes.where((c) => c.alive).toList();
+        if (alive.isEmpty) return false;
+        final atk = (actor.atk * skill.power).round();
+        for (final c in alive) {
+          _hit(actor, c, atk, skillId: skill.id);
         }
         return true;
       case SkillType.heal:
@@ -148,22 +279,28 @@ BattleResult simulateBattle(
           }
         }
         if (target == null) return false;
-        final maxHp = target.unit.baseStats.hp;
-        final amount = min(maxHp - target.hp, (maxHp * skill.power).round());
-        target.hp += amount;
-        emit(EventKind.heal, actor, target, amount, skillId: skill.id);
+        _heal(actor, target, skill.power, skillId: skill.id);
         return true;
+      case SkillType.healAll:
+        var healed = false;
+        for (final c in allies) {
+          if (!c.alive || c.hp >= c.unit.baseStats.hp) continue;
+          _heal(actor, c, skill.power, skillId: skill.id);
+          healed = true;
+        }
+        return healed;
       case SkillType.taunt:
         actor.tauntTurns = skill.duration;
-        emit(EventKind.taunt, actor, actor, skill.duration, skillId: skill.id);
+        _emit(EventKind.taunt, actor, actor, skill.duration,
+            skillId: skill.id);
         return true;
       case SkillType.stun:
         final target = pickTarget(foes);
         if (target == null) return false;
-        hit(actor, target, actor.atk, skillId: skill.id);
+        _hit(actor, target, actor.atk, skillId: skill.id);
         if (target.alive) {
           target.stunTurns += skill.duration;
-          emit(EventKind.stun, actor, target, skill.duration,
+          _emit(EventKind.stun, actor, target, skill.duration,
               skillId: skill.id);
         }
         return true;
@@ -172,58 +309,22 @@ BattleResult simulateBattle(
           if (!c.alive) continue;
           c.buffPct = skill.power;
           c.buffTurns = skill.duration;
-          emit(EventKind.buff, actor, c, skill.duration, skillId: skill.id);
+          _emit(EventKind.buff, actor, c, skill.duration, skillId: skill.id);
         }
         return true;
     }
   }
+}
 
-  while (round < maxRounds && sideAlive(hs) && sideAlive(es)) {
-    round++;
-    // Stable sort: higher speed first, ties keep list order (heroes first).
-    final order = [...all]..sort((a, b) {
-        final bySpd = b.unit.baseStats.spd.compareTo(a.unit.baseStats.spd);
-        return bySpd != 0 ? bySpd : all.indexOf(a).compareTo(all.indexOf(b));
-      });
-    for (final actor in order) {
-      if (!actor.alive) continue;
-      final allies = actor.side == Side.heroes ? hs : es;
-      final foes = actor.side == Side.heroes ? es : hs;
-      if (!sideAlive(foes)) break;
-
-      // Start of own turn: tick timers.
-      actor.cooldowns.updateAll((_, v) => v > 0 ? v - 1 : 0);
-      if (actor.tauntTurns > 0) actor.tauntTurns--;
-      if (actor.buffTurns > 0) actor.buffTurns--;
-
-      if (actor.stunTurns > 0) {
-        actor.stunTurns--;
-        emit(EventKind.skip, actor, actor, 0);
-        continue;
-      }
-
-      var acted = false;
-      for (final skill in actor.unit.skills) {
-        if ((actor.cooldowns[skill.id] ?? 0) > 0) continue;
-        if (useSkill(actor, skill, allies, foes)) {
-          actor.cooldowns[skill.id] = skill.cooldown;
-          acted = true;
-          break;
-        }
-      }
-      if (!acted) {
-        final target = pickTarget(foes);
-        if (target == null) break;
-        hit(actor, target, actor.atk);
-      }
-    }
+/// Runs a whole fight at once (heroes cast ultimates automatically).
+BattleResult simulateBattle(
+  List<Unit> heroes,
+  List<Unit> enemies, {
+  int maxRounds = 50,
+}) {
+  final battle = Battle(heroes, enemies, maxRounds: maxRounds)..auto = true;
+  while (!battle.finished) {
+    battle.step();
   }
-
-  final Side? winner = !sideAlive(es) && sideAlive(hs)
-      ? Side.heroes
-      : !sideAlive(hs) && sideAlive(es)
-          ? Side.enemies
-          : null;
-  return BattleResult(
-      winner: winner, rounds: round, log: log, events: events);
+  return battle.result;
 }

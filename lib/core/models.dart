@@ -6,7 +6,16 @@ enum Range { melee, ranged }
 
 enum Rarity { common, rare, epic, legendary }
 
-enum SkillType { none, damageMulti, heal, taunt, stun, buffAtk }
+enum SkillType {
+  none,
+  damageMulti,
+  damageAll,
+  heal,
+  healAll,
+  taunt,
+  stun,
+  buffAtk,
+}
 
 T _enumByName<T extends Enum>(List<T> values, String name) =>
     values.firstWhere((v) => v.name == name,
@@ -15,7 +24,9 @@ T _enumByName<T extends Enum>(List<T> values, String name) =>
 SkillType _skillType(String? name) => switch (name) {
       null => SkillType.none,
       'damage_multi' => SkillType.damageMulti,
+      'damage_all' => SkillType.damageAll,
       'heal' => SkillType.heal,
+      'heal_all' => SkillType.healAll,
       'taunt' => SkillType.taunt,
       'stun' => SkillType.stun,
       'buff_atk' => SkillType.buffAtk,
@@ -92,6 +103,7 @@ class Unit {
     required this.rarity,
     required this.baseStats,
     required this.skills,
+    this.ultimate,
     this.ai = false,
   });
 
@@ -104,6 +116,9 @@ class Unit {
   final Rarity rarity;
   final Stats baseStats;
   final List<Skill> skills;
+
+  /// Cast when energy is full (tap, or automatically in AUTO mode).
+  final Skill? ultimate;
   final bool ai;
 
   factory Unit.fromJson(Map<String, dynamic> json) => Unit(
@@ -119,6 +134,9 @@ class Unit {
           for (final s in json['skills'] as List)
             Skill.fromJson(s as Map<String, dynamic>)
         ],
+        ultimate: json['ultimate'] == null
+            ? null
+            : Skill.fromJson(json['ultimate'] as Map<String, dynamic>),
         ai: (json['ai'] as bool?) ?? false,
       );
 }
