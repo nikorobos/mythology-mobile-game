@@ -128,6 +128,26 @@ class Unit {
   final Skill? ultimate;
   final bool ai;
 
+  /// Copy with scaled HP and ATK (used for stage difficulty).
+  Unit scaled({double hp = 1.0, double atk = 1.0}) => Unit(
+        id: id,
+        nameKey: nameKey,
+        mythology: mythology,
+        tags: tags,
+        role: role,
+        range: range,
+        rarity: rarity,
+        baseStats: Stats(
+          hp: (baseStats.hp * hp).round(),
+          atk: (baseStats.atk * atk).round(),
+          def: baseStats.def,
+          spd: baseStats.spd,
+        ),
+        skills: skills,
+        ultimate: ultimate,
+        ai: ai,
+      );
+
   factory Unit.fromJson(Map<String, dynamic> json) => Unit(
         id: json['id'] as String,
         nameKey: json['nameKey'] as String,
@@ -145,5 +165,27 @@ class Unit {
             ? null
             : Skill.fromJson(json['ultimate'] as Map<String, dynamic>),
         ai: (json['ai'] as bool?) ?? false,
+      );
+}
+
+/// One stage: enemy unit ids (may repeat) and difficulty multipliers.
+class StageDef {
+  const StageDef({
+    required this.id,
+    required this.enemies,
+    this.hpMult = 1.0,
+    this.atkMult = 1.0,
+  });
+
+  final String id;
+  final List<String> enemies;
+  final double hpMult;
+  final double atkMult;
+
+  factory StageDef.fromJson(Map<String, dynamic> json) => StageDef(
+        id: json['id'] as String,
+        enemies: List<String>.from(json['enemies'] as List),
+        hpMult: (json['hpMult'] as num?)?.toDouble() ?? 1.0,
+        atkMult: (json['atkMult'] as num?)?.toDouble() ?? 1.0,
       );
 }

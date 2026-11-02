@@ -104,7 +104,7 @@ class _SquadScreenState extends State<SquadScreen> {
                   Text('${s.t('ui.stage')}:',
                       style: const TextStyle(color: _cream)),
                   const SizedBox(width: 12),
-                  for (var i = 0; i < stages.length; i++)
+                  for (var i = 0; i < c.stages.length; i++)
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: ChoiceChip(

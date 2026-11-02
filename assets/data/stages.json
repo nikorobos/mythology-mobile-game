@@ -1,0 +1,7 @@
+{
+  "_note": "PLACEHOLDER difficulty. hpMult/atkMult scale every enemy of the stage.",
+  "stages": [
+    {"id": "stage_1", "enemies": ["minotaur", "shadow_jackal", "shadow_jackal", "fenrir", "ammit"], "hpMult": 1.0, "atkMult": 1.0},
+    {"id": "stage_2", "enemies": ["ammit", "cerberus_duat", "frost_sphinx", "minotaur", "fenrir"], "hpMult": 1.5, "atkMult": 1.3}
+  ]
+}

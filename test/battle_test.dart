@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:theomyth/core/battle.dart';
 import 'package:theomyth/core/content.dart';
 import 'package:theomyth/core/models.dart';
+import 'package:theomyth/game_content.dart';
 
 void main() {
   final heroes = parseUnits(File('assets/data/heroes.json').readAsStringSync());
@@ -218,6 +219,19 @@ void main() {
         .toList();
     expect(foeAttacks.length, 1);
     expect(foeAttacks.first.skillId, isNull);
+  });
+
+  test('stages reference existing monsters and scale them', () {
+    final stages =
+        parseStages(File('assets/data/stages.json').readAsStringSync());
+    expect(stages, isNotEmpty);
+    for (final st in stages) {
+      final enemies = enemiesFor(monsters, st);
+      expect(enemies.length, st.enemies.length);
+    }
+    final scaled = monsters.first.scaled(hp: 2.0, atk: 0.5);
+    expect(scaled.baseStats.hp, monsters.first.baseStats.hp * 2);
+    expect(scaled.baseStats.atk, (monsters.first.baseStats.atk * 0.5).round());
   });
 
   test('stronger side wins', () {

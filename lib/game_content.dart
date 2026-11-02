@@ -4,34 +4,34 @@ import 'core/content.dart';
 import 'core/models.dart';
 import 'l10n/strings.dart';
 
-/// Placeholder stages: enemy unit ids per stage (ids may repeat).
-const List<List<String>> stages = [
-  ['minotaur', 'shadow_jackal', 'fenrir'],
-  ['ammit', 'cerberus_duat', 'frost_sphinx'],
-];
-
 const int maxSquadSize = 5;
 
 class GameContent {
-  const GameContent(this.heroes, this.monsters, this.strings);
+  const GameContent(this.heroes, this.monsters, this.stages, this.strings);
 
   final List<Unit> heroes;
   final List<Unit> monsters;
+  final List<StageDef> stages;
   final Strings strings;
 
-  List<Unit> enemiesForStage(int stage) {
-    final ids = stages[stage];
-    return [
-      for (final id in ids) monsters.firstWhere((m) => m.id == id),
-    ];
-  }
+  /// Enemy team of a stage, with the stage's difficulty multipliers applied.
+  List<Unit> enemiesForStage(int stage) => enemiesFor(monsters, stages[stage]);
 }
+
+List<Unit> enemiesFor(List<Unit> monsters, StageDef stage) => [
+      for (final id in stage.enemies)
+        monsters
+            .firstWhere((m) => m.id == id)
+            .scaled(hp: stage.hpMult, atk: stage.atkMult),
+    ];
 
 Future<GameContent> loadGameContent() async {
   final heroes =
       parseUnits(await rootBundle.loadString('assets/data/heroes.json'));
   final monsters =
       parseUnits(await rootBundle.loadString('assets/data/monsters.json'));
+  final stages =
+      parseStages(await rootBundle.loadString('assets/data/stages.json'));
   final strings = await Strings.load();
-  return GameContent(heroes, monsters, strings);
+  return GameContent(heroes, monsters, stages, strings);
 }
