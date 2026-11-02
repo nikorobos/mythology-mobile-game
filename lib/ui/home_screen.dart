@@ -319,10 +319,12 @@ class _Scene extends StatelessWidget {
                     constraints:
                         const BoxConstraints(minWidth: 44, minHeight: 44),
                   ),
-                  Flexible(
+                  Expanded(
                     child: Text(
                       '${s.t('ui.stage')} $stage'
                       '${isBoss ? '  ·  ${s.t('ui.boss')}' : ''}',
+                      maxLines: 1,
+                      textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
                       style: nunito(13),
                     ),
@@ -337,12 +339,11 @@ class _Scene extends StatelessWidget {
                     constraints:
                         const BoxConstraints(minWidth: 44, minHeight: 44),
                   ),
-                  const Spacer(),
                   for (var i = 1; i <= chapterLength; i++)
                     Container(
-                      width: 10,
-                      height: 10,
-                      margin: const EdgeInsets.only(left: 4),
+                      width: 9,
+                      height: 9,
+                      margin: const EdgeInsets.only(left: 3),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: i <= inChapter ? Pal.gold : Pal.dim,
