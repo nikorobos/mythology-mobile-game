@@ -41,6 +41,21 @@ void main() {
     expect(a.winner, isNotNull);
   });
 
+  test('events match the log and end with the loser at 0 hp', () {
+    final r = simulateBattle(heroes, monsters);
+    expect(r.events.length, r.log.length);
+    expect(r.events.last.targetHpAfter, 0);
+  });
+
+  test('every role has a label in both languages', () {
+    final en = parseStrings(File('assets/i18n/en.json').readAsStringSync());
+    final el = parseStrings(File('assets/i18n/el.json').readAsStringSync());
+    for (final r in Role.values) {
+      expect(en.containsKey('role.${r.name}'), isTrue);
+      expect(el.containsKey('role.${r.name}'), isTrue);
+    }
+  });
+
   test('stronger side wins', () {
     final r = simulateBattle(heroes, [monsters[1]]);
     expect(r.winner, Side.heroes);

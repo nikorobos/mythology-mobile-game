@@ -16,17 +16,36 @@ class Combatant {
   bool get alive => hp > 0;
 }
 
+/// One attack. Indexes refer to the combined list [heroes..., enemies...].
+class BattleEvent {
+  const BattleEvent({
+    required this.round,
+    required this.actorIndex,
+    required this.targetIndex,
+    required this.damage,
+    required this.targetHpAfter,
+  });
+
+  final int round;
+  final int actorIndex;
+  final int targetIndex;
+  final int damage;
+  final int targetHpAfter;
+}
+
 class BattleResult {
   const BattleResult({
     required this.winner,
     required this.rounds,
     required this.log,
+    required this.events,
   });
 
   /// null = draw (round limit reached).
   final Side? winner;
   final int rounds;
   final List<String> log;
+  final List<BattleEvent> events;
 }
 
 int calcDamage(int atk, int def) {
@@ -52,6 +71,7 @@ BattleResult simulateBattle(
   final es = [for (final u in enemies) Combatant(u, Side.enemies)];
   final all = [...hs, ...es];
   final log = <String>[];
+  final events = <BattleEvent>[];
 
   bool sideAlive(List<Combatant> s) => s.any((c) => c.alive);
 
@@ -67,10 +87,18 @@ BattleResult simulateBattle(
       if (!actor.alive) continue;
       final target = pickTarget(actor.side == Side.heroes ? es : hs);
       if (target == null) break;
-      final dmg = calcDamage(actor.unit.baseStats.atk, target.unit.baseStats.def);
+      final dmg =
+          calcDamage(actor.unit.baseStats.atk, target.unit.baseStats.def);
       target.hp = target.hp - dmg < 0 ? 0 : target.hp - dmg;
       log.add('R$round ${actor.unit.id} -> ${target.unit.id}: $dmg '
           '(hp ${target.hp})');
+      events.add(BattleEvent(
+        round: round,
+        actorIndex: all.indexOf(actor),
+        targetIndex: all.indexOf(target),
+        damage: dmg,
+        targetHpAfter: target.hp,
+      ));
     }
   }
 
@@ -79,5 +107,6 @@ BattleResult simulateBattle(
       : !sideAlive(hs) && sideAlive(es)
           ? Side.enemies
           : null;
-  return BattleResult(winner: winner, rounds: round, log: log);
+  return BattleResult(
+      winner: winner, rounds: round, log: log, events: events);
 }
