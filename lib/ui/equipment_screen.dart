@@ -4,7 +4,7 @@ import '../core/equipment.dart';
 import '../core/format.dart';
 import '../game_content.dart';
 import '../l10n/strings.dart';
-import 'summon_screen.dart' show rarityColor;
+import 'theme.dart' show rarityColor;
 
 const _bg = Color(0xFF14122B);
 const _panel = Color(0xFF1D1A3D);

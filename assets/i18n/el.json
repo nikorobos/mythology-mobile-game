@@ -184,5 +184,19 @@
   "ui.back": "Πίσω",
   "ui.ult_hint": "Πάτα μια λαμπερή φιγούρα για να εξαπολύσεις το απόλυτο",
   "ui.ult_ready": "έτοιμο",
-  "ui.ult_charging": "φορτίζει"
+  "ui.ult_charging": "φορτίζει",
+  "ui.all": "Όλοι",
+  "ui.collected": "συλλεγμένοι",
+  "ui.filter": "Φίλτρο",
+  "ui.locked": "Κλειδωμένος",
+  "ui.locked_hint": "Κάλεσέ τον για να τον ξεκλειδώσεις.",
+  "ui.hero": "Ήρωας",
+  "ui.level_long": "Επίπεδο",
+  "ui.skills": "Ικανότητες",
+  "ui.placeholder_art": "Προσωρινό σχέδιο",
+  "ui.squad_full": "Η ομάδα σου είναι γεμάτη (5 ήρωες).",
+  "ui.in_squad": "Στην ομάδα",
+  "ui.add_to_squad": "Πρόσθεσε στην ομάδα",
+  "range.melee": "Σώμα με σώμα",
+  "range.ranged": "Εξ αποστάσεως"
 }

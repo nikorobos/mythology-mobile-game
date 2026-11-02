@@ -184,5 +184,19 @@
   "ui.back": "Back",
   "ui.ult_hint": "Tap a glowing portrait to unleash an ultimate",
   "ui.ult_ready": "ready",
-  "ui.ult_charging": "charging"
+  "ui.ult_charging": "charging",
+  "ui.all": "All",
+  "ui.collected": "collected",
+  "ui.filter": "Filter",
+  "ui.locked": "Locked",
+  "ui.locked_hint": "Summon to unlock this hero.",
+  "ui.hero": "Hero",
+  "ui.level_long": "Level",
+  "ui.skills": "Skills",
+  "ui.placeholder_art": "Placeholder art",
+  "ui.squad_full": "Your squad is full (5 heroes).",
+  "ui.in_squad": "In squad",
+  "ui.add_to_squad": "Add to squad",
+  "range.melee": "Melee",
+  "range.ranged": "Ranged"
 }
