@@ -759,9 +759,8 @@ class _BattleScreenState extends State<BattleScreen>
                       offset: Offset(dx, dy),
                       child: Transform(
                         alignment: Alignment.bottomCenter,
-                        transform: Matrix4.identity()
-                          ..rotateZ(rot)
-                          ..scale(scaleX, scaleY),
+                        transform: Matrix4.rotationZ(rot) *
+                            Matrix4.diagonal3Values(scaleX, scaleY, 1),
                         child: RepaintBoundary(child: body),
                       ),
                     ),
