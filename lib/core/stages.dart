@@ -94,7 +94,9 @@ ChapterDef chapterAt(int stage, StageConfig c) =>
 double _growth(double rate, int stage) =>
     min(pow(rate, stage - 1).toDouble(), 1e9);
 
-/// Enemy team for [stage] (1-based).
+/// Enemy team for [stage] (1-based). The monster mix depends only on the team
+/// size (not on the stage number), so difficulty rises smoothly instead of
+/// zigzagging between stages.
 List<Unit> buildStage(int stage, List<Unit> monsters, StageConfig c) {
   if (stage < 1) throw ArgumentError.value(stage, 'stage', 'must be >= 1');
   Unit byId(String id) => monsters.firstWhere((m) => m.id == id);
@@ -106,15 +108,13 @@ List<Unit> buildStage(int stage, List<Unit> monsters, StageConfig c) {
     return [
       byId(chapter.boss).scaled(hp: hp * c.bossHpMult, atk: atk * c.bossAtkMult),
       for (var i = 0; i < c.maxSize - 1; i++)
-        byId(chapter.pool[(stage - 1 + i) % chapter.pool.length])
-            .scaled(hp: hp, atk: atk),
+        byId(chapter.pool[i % chapter.pool.length]).scaled(hp: hp, atk: atk),
     ];
   }
 
   final size = min(c.maxSize, c.minSize + (stage - 1) ~/ c.growEveryStages);
   return [
     for (var i = 0; i < size; i++)
-      byId(chapter.pool[(stage - 1 + i) % chapter.pool.length])
-          .scaled(hp: hp, atk: atk),
+      byId(chapter.pool[i % chapter.pool.length]).scaled(hp: hp, atk: atk),
   ];
 }

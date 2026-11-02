@@ -1,16 +1,68 @@
 {
-  "_note": "PLACEHOLDER endless-stage settings. Stat of stage n = base * growth^(n-1). One chapter = one myth, bossEvery stages long, chapters loop forever.",
+  "_note": "PLACEHOLDER endless-stage settings. Stat of stage n = base * growth^(n-1). One chapter = one myth, bossEvery stages long, chapters loop forever. Monster mix depends only on team size (no per-stage rotation). Balanced 2026-11-02.",
   "bossEvery": 10,
   "minSize": 2,
   "maxSize": 5,
   "growEveryStages": 2,
-  "hpGrowth": 1.08,
-  "atkGrowth": 1.06,
-  "bossHpMult": 3.0,
-  "bossAtkMult": 1.3,
+  "hpGrowth": 1.04,
+  "atkGrowth": 1.03,
+  "bossHpMult": 1.5,
+  "bossAtkMult": 1.1,
   "chapters": [
-    {"id": "twelfth_labor", "mythology": "greek", "pool": ["minotaur", "cerberus_duat"], "boss": "cerberus_duat"},
-    {"id": "ragnarok", "mythology": "norse", "pool": ["fenrir", "frost_sphinx"], "boss": "fenrir"},
-    {"id": "weighing_heart", "mythology": "egyptian", "pool": ["shadow_jackal", "ammit"], "boss": "ammit"}
+    {
+      "id": "twelfth_labor",
+      "mythology": "greek",
+      "pool": [
+        "erinys",
+        "cerberus"
+      ],
+      "boss": "cerberus"
+    },
+    {
+      "id": "ragnarok",
+      "mythology": "norse",
+      "pool": [
+        "fenrir",
+        "frost_sphinx"
+      ],
+      "boss": "fenrir"
+    },
+    {
+      "id": "weighing_heart",
+      "mythology": "egyptian",
+      "pool": [
+        "shadow_jackal",
+        "ammit"
+      ],
+      "boss": "ammit"
+    },
+    {
+      "id": "monster_slayers",
+      "mythology": "greek",
+      "pool": [
+        "minotaur",
+        "chimera"
+      ],
+      "boss": "medusa"
+    },
+    {
+      "id": "trojan_war",
+      "mythology": "greek",
+      "pool": [
+        "memnon",
+        "penthesilea",
+        "sea_serpent"
+      ],
+      "boss": "hector"
+    },
+    {
+      "id": "titanomachy",
+      "mythology": "greek",
+      "pool": [
+        "titan",
+        "giant"
+      ],
+      "boss": "cronus"
+    }
   ]
 }

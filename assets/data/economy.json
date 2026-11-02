@@ -1,5 +1,5 @@
 {
-  "_note": "PLACEHOLDER economy. Hero stat = base * (1 + levelStatGrowth*(L-1)) * (1 + starStatGrowth*(stars-1)). Level-up cost = levelCostBase * levelCostGrowth^(L-1). Battle gold = winGoldBase * winGoldGrowth^(stage-1); a loss pays loseGoldFraction. Gems come from first clears. Summon: weights by rarity, epic guaranteed after pityEpic pulls without one; a duplicate gives dupShards; star s -> s+1 costs starShardCosts[s-1]. Idle: gold per minute = idleGoldFraction * win gold of the best cleared stage; stops after maxIdleMinutes away; the ad button multiplies by adMultiplier.",
+  "_note": "PLACEHOLDER economy. Hero stat = base * (1 + levelStatGrowth*(L-1)) * (1 + starStatGrowth*(stars-1)). Level-up cost = levelCostBase * levelCostGrowth^(L-1). Battle gold = winGoldBase * winGoldGrowth^(stage-1); a loss pays loseGoldFraction. Gems come from first clears. Summon: weights by rarity, epic guaranteed after pityEpic pulls without one; a duplicate gives dupShards; star s -> s+1 costs starShardCosts[s-1]. Idle: gold per minute = idleGoldFraction * win gold of the best cleared stage; stops after maxIdleMinutes away; the ad button multiplies by adMultiplier. BALANCE PASS 2026-11-02 (simulated with a Python port of the battle engine): starter trio should win stage n at roughly level 1+0.5n, reaching stage 10 in ~25 battles, 20 in ~70, 30 in ~165, 50 in ~290 (before idle gold).",
   "startGold": 500,
   "startGems": 300,
   "starterHeroes": [
@@ -8,11 +8,11 @@
     "asclepius"
   ],
   "maxLevel": 100,
-  "levelStatGrowth": 0.12,
+  "levelStatGrowth": 0.1,
   "levelCostBase": 100,
-  "levelCostGrowth": 1.15,
+  "levelCostGrowth": 1.14,
   "winGoldBase": 50,
-  "winGoldGrowth": 1.1,
+  "winGoldGrowth": 1.07,
   "loseGoldFraction": 0.2,
   "stageClearGems": 20,
   "bossClearGems": 60,

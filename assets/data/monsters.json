@@ -206,6 +206,409 @@
         "power": 0.8
       },
       "ai": true
+    },
+    {
+      "id": "chimera",
+      "nameKey": "monster.chimera.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1000,
+        "atk": 85,
+        "def": 45,
+        "spd": 50
+      },
+      "skills": [
+        {
+          "id": "savage_pounce",
+          "nameKey": "skill.savage_pounce.name",
+          "descKey": "skill.savage_pounce.desc",
+          "type": "damage_multi",
+          "hits": 2,
+          "power": 0.7,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "chimeras_fury",
+        "nameKey": "skill.chimeras_fury.name",
+        "descKey": "skill.chimeras_fury.desc",
+        "type": "damage_all",
+        "power": 0.9
+      },
+      "ai": true
+    },
+    {
+      "id": "medusa",
+      "nameKey": "monster.medusa.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "ranged",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 900,
+        "atk": 80,
+        "def": 35,
+        "spd": 52
+      },
+      "skills": [
+        {
+          "id": "stone_gaze",
+          "nameKey": "skill.stone_gaze.name",
+          "descKey": "skill.stone_gaze.desc",
+          "type": "stun",
+          "duration": 1,
+          "cooldown": 4
+        }
+      ],
+      "ultimate": {
+        "id": "gaze_of_stone",
+        "nameKey": "skill.gaze_of_stone.name",
+        "descKey": "skill.gaze_of_stone.desc",
+        "type": "damage_all",
+        "power": 0.8
+      },
+      "ai": true
+    },
+    {
+      "id": "erinys",
+      "nameKey": "monster.erinys.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "ranged",
+      "rarity": "rare",
+      "baseStats": {
+        "hp": 800,
+        "atk": 75,
+        "def": 35,
+        "spd": 55
+      },
+      "skills": [
+        {
+          "id": "relentless_pursuit",
+          "nameKey": "skill.relentless_pursuit.name",
+          "descKey": "skill.relentless_pursuit.desc",
+          "type": "damage_multi",
+          "hits": 2,
+          "power": 0.8,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "wrath_of_the_furies",
+        "nameKey": "skill.wrath_of_the_furies.name",
+        "descKey": "skill.wrath_of_the_furies.desc",
+        "type": "damage_all",
+        "power": 0.8
+      },
+      "ai": true
+    },
+    {
+      "id": "sea_serpent",
+      "nameKey": "monster.sea_serpent.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "rare",
+      "baseStats": {
+        "hp": 900,
+        "atk": 70,
+        "def": 40,
+        "spd": 48
+      },
+      "skills": [
+        {
+          "id": "constrict",
+          "nameKey": "skill.constrict.name",
+          "descKey": "skill.constrict.desc",
+          "type": "stun",
+          "duration": 1,
+          "cooldown": 4
+        }
+      ],
+      "ultimate": {
+        "id": "tidal_coil",
+        "nameKey": "skill.tidal_coil.name",
+        "descKey": "skill.tidal_coil.desc",
+        "type": "damage_all",
+        "power": 0.8
+      },
+      "ai": true
+    },
+    {
+      "id": "titan",
+      "nameKey": "monster.titan.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "tank",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1400,
+        "atk": 75,
+        "def": 60,
+        "spd": 30
+      },
+      "skills": [
+        {
+          "id": "titans_stand",
+          "nameKey": "skill.titans_stand.name",
+          "descKey": "skill.titans_stand.desc",
+          "type": "taunt",
+          "duration": 2,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "titanic_slam",
+        "nameKey": "skill.titanic_slam.name",
+        "descKey": "skill.titanic_slam.desc",
+        "type": "damage_all",
+        "power": 0.9
+      },
+      "ai": true
+    },
+    {
+      "id": "giant",
+      "nameKey": "monster.giant.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "rare",
+      "baseStats": {
+        "hp": 1100,
+        "atk": 80,
+        "def": 50,
+        "spd": 34
+      },
+      "skills": [
+        {
+          "id": "boulder_throw",
+          "nameKey": "skill.boulder_throw.name",
+          "descKey": "skill.boulder_throw.desc",
+          "type": "damage_multi",
+          "hits": 1,
+          "power": 1.0,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "earthshaker",
+        "nameKey": "skill.earthshaker.name",
+        "descKey": "skill.earthshaker.desc",
+        "type": "damage_all",
+        "power": 0.9
+      },
+      "ai": true
+    },
+    {
+      "id": "cronus",
+      "nameKey": "monster.cronus.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1500,
+        "atk": 90,
+        "def": 55,
+        "spd": 40
+      },
+      "skills": [
+        {
+          "id": "overthrow",
+          "nameKey": "skill.overthrow.name",
+          "descKey": "skill.overthrow.desc",
+          "type": "damage_multi",
+          "hits": 2,
+          "power": 1.0,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "reign_of_cronus",
+        "nameKey": "skill.reign_of_cronus.name",
+        "descKey": "skill.reign_of_cronus.desc",
+        "type": "damage_all",
+        "power": 1.1
+      },
+      "ai": true
+    },
+    {
+      "id": "penthesilea",
+      "nameKey": "monster.penthesilea.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "ranged",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 800,
+        "atk": 100,
+        "def": 35,
+        "spd": 60
+      },
+      "skills": [
+        {
+          "id": "amazon_charge",
+          "nameKey": "skill.amazon_charge.name",
+          "descKey": "skill.amazon_charge.desc",
+          "type": "damage_multi",
+          "hits": 2,
+          "power": 1.1,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "queens_volley",
+        "nameKey": "skill.queens_volley.name",
+        "descKey": "skill.queens_volley.desc",
+        "type": "damage_all",
+        "power": 0.9
+      },
+      "ai": true
+    },
+    {
+      "id": "memnon",
+      "nameKey": "monster.memnon.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "tank",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1250,
+        "atk": 70,
+        "def": 70,
+        "spd": 36
+      },
+      "skills": [
+        {
+          "id": "bronze_guard",
+          "nameKey": "skill.bronze_guard.name",
+          "descKey": "skill.bronze_guard.desc",
+          "type": "taunt",
+          "duration": 2,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "dawn_strike",
+        "nameKey": "skill.dawn_strike.name",
+        "descKey": "skill.dawn_strike.desc",
+        "type": "damage_all",
+        "power": 0.9
+      },
+      "ai": true
+    },
+    {
+      "id": "hector",
+      "nameKey": "monster.hector.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "tank",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1400,
+        "atk": 85,
+        "def": 60,
+        "spd": 42
+      },
+      "skills": [
+        {
+          "id": "defender_of_troy",
+          "nameKey": "skill.defender_of_troy.name",
+          "descKey": "skill.defender_of_troy.desc",
+          "type": "taunt",
+          "duration": 2,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "hectors_wrath",
+        "nameKey": "skill.hectors_wrath.name",
+        "descKey": "skill.hectors_wrath.desc",
+        "type": "damage_multi",
+        "hits": 3,
+        "power": 1.1
+      },
+      "ai": true
+    },
+    {
+      "id": "cerberus",
+      "nameKey": "monster.cerberus.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1300,
+        "atk": 80,
+        "def": 50,
+        "spd": 45
+      },
+      "skills": [
+        {
+          "id": "triple_bite",
+          "nameKey": "skill.triple_bite.name",
+          "descKey": "skill.triple_bite.desc",
+          "type": "damage_all",
+          "power": 0.55,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "triple_fury",
+        "nameKey": "skill.triple_fury.name",
+        "descKey": "skill.triple_fury.desc",
+        "type": "damage_multi",
+        "hits": 3,
+        "power": 1.1
+      },
+      "ai": true
     }
   ]
 }

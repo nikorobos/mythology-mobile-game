@@ -17,7 +17,7 @@ void main() {
 
   test('content parses into units', () {
     expect(heroes.length, 9);
-    expect(monsters.length, 6);
+    expect(monsters.length, 17);
     expect(monsters.every((m) => m.ai), isTrue);
     expect(heroes.first.role, Role.tank);
   });
@@ -265,7 +265,7 @@ void main() {
 
     test('level multiplier and costs grow', () {
       expect(eco.statMult(1), 1.0);
-      expect(eco.statMult(11), closeTo(2.2, 1e-9));
+      expect(eco.statMult(11), closeTo(2.0, 1e-9));
       expect(eco.levelUpCost(1), 100);
       expect(eco.levelUpCost(2) > eco.levelUpCost(1), isTrue);
       expect(eco.levelUpCost(100000) > 0, isTrue); // capped, no overflow
