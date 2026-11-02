@@ -201,95 +201,124 @@ class _SquadScreenState extends State<SquadScreen> {
     final canUp = player.state.canLevelUp(h.id, c.economy);
     final maxed = level >= c.economy.maxLevel;
     final cost = c.economy.levelUpCost(level);
+    final selected = _selected.contains(h.id);
     return Card(
       color: _panel,
-      child: CheckboxListTile(
-        value: _selected.contains(h.id),
-        activeColor: _gold,
-        checkColor: _bg,
-        onChanged: (v) => setState(() {
-          if (v == true) {
-            if (_selected.length < maxSquadSize) _selected.add(h.id);
-          } else {
-            _selected.remove(h.id);
-          }
-        }),
-        title: Row(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(4, 8, 8, 8),
+        child: Row(
           children: [
-            Flexible(
-              child: Text('${s.t(h.nameKey)}  ${s.t('ui.level')} $level',
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      color: _cream, fontWeight: FontWeight.w800)),
+            Checkbox(
+              value: selected,
+              activeColor: _gold,
+              checkColor: _bg,
+              onChanged: (v) => setState(() {
+                if (v == true) {
+                  if (_selected.length < maxSquadSize) _selected.add(h.id);
+                } else {
+                  _selected.remove(h.id);
+                }
+              }),
             ),
-            const SizedBox(width: 6),
-            const Icon(Icons.star, size: 16, color: _gold),
-            Text('$stars',
-                style: const TextStyle(
-                    color: _gold, fontWeight: FontWeight.w900)),
-          ],
-        ),
-        subtitle: Row(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 4, right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: roleColor(h.role),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(s.t('role.${h.role.name}'),
-                  style: const TextStyle(
-                      color: Color(0xFF1B1030),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800)),
-            ),
-            Flexible(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                    'HP ${formatNumber(stats.hp)}  ATK ${formatNumber(stats.atk)}'
-                    '${starCost == null ? '' : '  ${s.t('ui.shards')} ${player.state.shardsOf(h.id)}/$starCost'}',
-                    style: const TextStyle(color: _muted, fontSize: 12)),
-              ),
-            ),
-          ],
-        ),
-        secondary: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (!maxed)
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: _gold,
-                  foregroundColor: _bg,
-                  minimumSize: const Size(64, 36),
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                ),
-                onPressed: canUp ? () => player.levelUp(h.id) : null,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.arrow_upward, size: 16),
-                    const SizedBox(width: 4),
-                    Text(formatNumber(cost)),
-                  ],
-                ),
-              ),
-            if (canStar)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFB07CFF),
-                    foregroundColor: _bg,
-                    minimumSize: const Size(64, 32),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    spacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(s.t(h.nameKey),
+                          style: const TextStyle(
+                              color: _cream,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 16)),
+                      Text('${s.t('ui.level')} $level',
+                          style: const TextStyle(color: _cream)),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.star, size: 16, color: _gold),
+                          Text('$stars',
+                              style: const TextStyle(
+                                  color: _gold, fontWeight: FontWeight.w900)),
+                        ],
+                      ),
+                    ],
                   ),
-                  onPressed: () => player.starUp(h.id),
-                  child: const Icon(Icons.star, size: 16),
-                ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 2,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: roleColor(h.role),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(s.t('role.${h.role.name}'),
+                            style: const TextStyle(
+                                color: Color(0xFF1B1030),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800)),
+                      ),
+                      Text(
+                          'HP ${formatNumber(stats.hp)}  '
+                          'ATK ${formatNumber(stats.atk)}',
+                          style:
+                              const TextStyle(color: _muted, fontSize: 12)),
+                      if (starCost != null)
+                        Text(
+                            '${s.t('ui.shards')} '
+                            '${player.state.shardsOf(h.id)}/$starCost',
+                            style:
+                                const TextStyle(color: _muted, fontSize: 12)),
+                    ],
+                  ),
+                ],
               ),
+            ),
+            const SizedBox(width: 8),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!maxed)
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _gold,
+                      foregroundColor: _bg,
+                      minimumSize: const Size(72, 36),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                    onPressed: canUp ? () => player.levelUp(h.id) : null,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.arrow_upward, size: 16),
+                        const SizedBox(width: 4),
+                        Text(formatNumber(cost)),
+                      ],
+                    ),
+                  ),
+                if (canStar)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFFB07CFF),
+                        foregroundColor: _bg,
+                        minimumSize: const Size(72, 32),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                      ),
+                      onPressed: () => player.starUp(h.id),
+                      child: const Icon(Icons.star, size: 16),
+                    ),
+                  ),
+              ],
+            ),
           ],
         ),
       ),
