@@ -84,8 +84,9 @@ class BattleResult {
     required this.events,
   });
 
-  /// null = draw (round limit reached).
-  final Side? winner;
+  /// Never a draw: if the round limit is reached with both sides alive,
+  /// the heroes failed to clear the stage in time, so the enemies win.
+  final Side winner;
   final int rounds;
   final List<String> log;
   final List<BattleEvent> events;
@@ -137,11 +138,11 @@ class Battle {
       !_sideAlive(es) ||
       (round >= maxRounds && _cursor >= _queue.length);
 
-  Side? get winner => !_sideAlive(es) && _sideAlive(hs)
-      ? Side.heroes
-      : !_sideAlive(hs) && _sideAlive(es)
-          ? Side.enemies
-          : null;
+  /// Win or defeat only. Heroes win only by killing every enemy while at
+  /// least one hero lives; anything else (all heroes dead, both sides dead,
+  /// or the round limit reached) is a defeat.
+  Side get winner =>
+      !_sideAlive(es) && _sideAlive(hs) ? Side.heroes : Side.enemies;
 
   BattleResult get result => BattleResult(
         winner: winner,

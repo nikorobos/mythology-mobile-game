@@ -4,7 +4,6 @@
   "ui.auto": "AUTO",
   "ui.victory": "VICTORY",
   "ui.defeat": "DEFEAT",
-  "ui.draw": "DRAW",
   "ui.replay": "REPLAY",
   "ui.round": "Round",
   "ui.speed": "Speed",

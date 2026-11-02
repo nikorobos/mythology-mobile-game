@@ -118,11 +118,9 @@ class _BattleScreenState extends State<BattleScreen> {
 
   String get _outcome {
     final s = widget.strings;
-    return switch (_battle.winner) {
-      Side.heroes => s.t('ui.victory'),
-      Side.enemies => s.t('ui.defeat'),
-      null => s.t('ui.draw'),
-    };
+    return _battle.winner == Side.heroes
+        ? s.t('ui.victory')
+        : s.t('ui.defeat');
   }
 
   String get _banner {
@@ -281,8 +279,8 @@ class _BattleScreenState extends State<BattleScreen> {
                 builder: (context, box) => Align(
                   // Slight stagger like the board.
                   alignment: (i - from).isOdd
-                      ? const Alignment(0, 0.45)
-                      : const Alignment(0, -0.2),
+                      ? const Alignment(0, 0.35)
+                      : const Alignment(0, -0.15),
                   child: _figure(i, box.maxWidth),
                 ),
               ),
@@ -302,7 +300,7 @@ class _BattleScreenState extends State<BattleScreen> {
     final targeted = current?.targetIndex == index;
     final float = (targeted && current != null) ? _floating(current) : null;
     final isHero = index < widget.heroes.length;
-    final size = (w - 6).clamp(44.0, 84.0).toDouble();
+    final size = (w - 4).clamp(52.0, 104.0).toDouble();
     final ring = targeted
         ? (current?.kind == EventKind.heal
             ? const Color(0x805FD38D)
@@ -355,6 +353,8 @@ class _BattleScreenState extends State<BattleScreen> {
                     child: AnimatedScale(
                       scale: acting ? 1.12 : 1,
                       duration: const Duration(milliseconds: 150),
+                      // Swap point for real art: replace HeroBust /
+                      // MonsterFigure (lib/ui/widgets.dart) with the real figures.
                       child: isHero
                           ? HeroBust(unit: unit, size: size)
                           : MonsterFigure(unit: unit, size: size * 0.8),
@@ -362,7 +362,7 @@ class _BattleScreenState extends State<BattleScreen> {
                   ),
                   if (float != null)
                     Positioned(
-                      top: -8,
+                      top: 10,
                       left: -10,
                       right: -10,
                       child: Center(
@@ -382,10 +382,10 @@ class _BattleScreenState extends State<BattleScreen> {
             ),
             Text(
               widget.strings.t(unit.nameKey),
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: nunito(11, shadows: true),
+              style: nunito(12, shadows: true),
             ),
           ],
         ),
@@ -684,7 +684,7 @@ class _ArenaPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
-    canvas.drawCircle(Offset(w * 0.77, h * 0.14), 40,
+    canvas.drawCircle(Offset(w * 0.86, h * 0.075), 30,
         Paint()..color = const Color(0x99FFE08A));
     final pillar = Paint()..color = const Color(0x29FFFFFF);
     canvas.drawRect(Rect.fromLTWH(w * 0.04, h * 0.13, 30, h * 0.31), pillar);
@@ -699,14 +699,10 @@ class _ArenaPainter extends CustomPainter {
           ..lineTo(0, h)
           ..close(),
         Paint()..color = const Color(0x8CB88A55));
-    final soft = Paint()..color = const Color(0x1A000000);
+    final soft = Paint()..color = const Color(0x0D000000);
     canvas.drawOval(
         Rect.fromCenter(
-            center: Offset(w / 2, h * 0.56), width: w * 0.9, height: 70),
-        soft);
-    canvas.drawOval(
-        Rect.fromCenter(
-            center: Offset(w / 2, h * 0.69), width: w * 0.92, height: 80),
+            center: Offset(w / 2, h * 0.70), width: w * 0.9, height: 60),
         soft);
   }
 

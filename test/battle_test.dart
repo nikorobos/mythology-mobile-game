@@ -483,4 +483,19 @@ void main() {
     final r = simulateBattle(heroes, [monsters[1]]);
     expect(r.winner, Side.heroes);
   });
+
+  test('no draws: hitting the round limit is a defeat for the heroes', () {
+    // Neither side can finish the other within 1 round.
+    final hero = mk('slow_hero', Range.melee, 1000, 1, 10, const []);
+    final foe = mk('tough_foe', Range.melee, 1000, 1, 1, const []);
+    final r = simulateBattle([hero], [foe], maxRounds: 1);
+    expect(r.winner, Side.enemies);
+  });
+
+  test('winning still works', () {
+    final hero = mk('strong_hero', Range.melee, 1000, 500, 10, const []);
+    final foe = mk('weak_foe', Range.melee, 10, 1, 1, const []);
+    final r = simulateBattle([hero], [foe]);
+    expect(r.winner, Side.heroes);
+  });
 }
