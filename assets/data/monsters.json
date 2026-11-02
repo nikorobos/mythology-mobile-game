@@ -2,24 +2,210 @@
   "_note": "PLACEHOLDER stats for prototype only.",
   "units": [
     {
-      "id": "minotaur", "nameKey": "monster.minotaur.name", "mythology": "greek",
-      "tags": ["greek", "monster"], "role": "tank", "range": "melee", "rarity": "rare", "ai": true,
-      "baseStats": {"hp": 1000, "atk": 70, "def": 50, "spd": 35},
-      "skills": [{"id": "charge", "nameKey": "skill.charge.name", "descKey": "skill.charge.desc", "type": "stun", "duration": 1, "cooldown": 3}],
-      "ultimate": {"id": "labyrinth_rage", "nameKey": "skill.labyrinth_rage.name", "descKey": "skill.labyrinth_rage.desc", "type": "damage_all", "power": 0.9}
+      "id": "minotaur",
+      "nameKey": "monster.minotaur.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "monster"
+      ],
+      "role": "tank",
+      "range": "melee",
+      "rarity": "rare",
+      "ai": true,
+      "baseStats": {
+        "hp": 1000,
+        "atk": 70,
+        "def": 50,
+        "spd": 35
+      },
+      "skills": [
+        {
+          "id": "charge",
+          "nameKey": "skill.charge.name",
+          "descKey": "skill.charge.desc",
+          "type": "stun",
+          "duration": 1,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "labyrinth_rage",
+        "nameKey": "skill.labyrinth_rage.name",
+        "descKey": "skill.labyrinth_rage.desc",
+        "type": "damage_all",
+        "power": 0.9
+      }
     },
     {
-      "id": "shadow_jackal", "nameKey": "monster.shadow_jackal.name", "mythology": "egyptian",
-      "tags": ["egyptian", "monster", "minion"], "role": "dps", "range": "melee", "rarity": "common", "ai": true,
-      "baseStats": {"hp": 400, "atk": 50, "def": 20, "spd": 55},
+      "id": "shadow_jackal",
+      "nameKey": "monster.shadow_jackal.name",
+      "mythology": "egyptian",
+      "tags": [
+        "egyptian",
+        "monster",
+        "minion"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "common",
+      "ai": true,
+      "baseStats": {
+        "hp": 400,
+        "atk": 50,
+        "def": 20,
+        "spd": 55
+      },
       "skills": []
     },
     {
-      "id": "fenrir", "nameKey": "monster.fenrir.name", "mythology": "norse",
-      "tags": ["norse", "monster"], "role": "dps", "range": "melee", "rarity": "epic", "ai": true,
-      "baseStats": {"hp": 1100, "atk": 95, "def": 45, "spd": 58},
-      "skills": [{"id": "howl", "nameKey": "skill.howl.name", "descKey": "skill.howl.desc", "type": "buff_atk", "power": 0.3, "duration": 3, "cooldown": 4}],
-      "ultimate": {"id": "ragnarok_fury", "nameKey": "skill.ragnarok_fury.name", "descKey": "skill.ragnarok_fury.desc", "type": "damage_all", "power": 1.2}
+      "id": "fenrir",
+      "nameKey": "monster.fenrir.name",
+      "mythology": "norse",
+      "tags": [
+        "norse",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "epic",
+      "ai": true,
+      "baseStats": {
+        "hp": 1100,
+        "atk": 95,
+        "def": 45,
+        "spd": 58
+      },
+      "skills": [
+        {
+          "id": "howl",
+          "nameKey": "skill.howl.name",
+          "descKey": "skill.howl.desc",
+          "type": "buff_atk",
+          "power": 0.3,
+          "duration": 3,
+          "cooldown": 4
+        }
+      ],
+      "ultimate": {
+        "id": "ragnarok_fury",
+        "nameKey": "skill.ragnarok_fury.name",
+        "descKey": "skill.ragnarok_fury.desc",
+        "type": "damage_all",
+        "power": 1.2
+      }
+    },
+    {
+      "id": "ammit",
+      "nameKey": "monster.ammit.name",
+      "mythology": "egyptian",
+      "tags": [
+        "egyptian",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1200,
+        "atk": 85,
+        "def": 55,
+        "spd": 33
+      },
+      "skills": [
+        {
+          "id": "devour",
+          "nameKey": "skill.devour.name",
+          "descKey": "skill.devour.desc",
+          "type": "damage_multi",
+          "hits": 2,
+          "power": 1.0,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "judgment_of_the_heart",
+        "nameKey": "skill.judgment_of_the_heart.name",
+        "descKey": "skill.judgment_of_the_heart.desc",
+        "type": "damage_all",
+        "power": 1.0
+      },
+      "ai": true
+    },
+    {
+      "id": "cerberus_duat",
+      "nameKey": "monster.cerberus_duat.name",
+      "mythology": "greek",
+      "tags": [
+        "greek",
+        "egyptian",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1300,
+        "atk": 80,
+        "def": 50,
+        "spd": 45
+      },
+      "skills": [
+        {
+          "id": "triple_bite",
+          "nameKey": "skill.triple_bite.name",
+          "descKey": "skill.triple_bite.desc",
+          "type": "damage_all",
+          "power": 0.55,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "triple_fury",
+        "nameKey": "skill.triple_fury.name",
+        "descKey": "skill.triple_fury.desc",
+        "type": "damage_multi",
+        "hits": 3,
+        "power": 1.1
+      },
+      "ai": true
+    },
+    {
+      "id": "frost_sphinx",
+      "nameKey": "monster.frost_sphinx.name",
+      "mythology": "egyptian",
+      "tags": [
+        "egyptian",
+        "norse",
+        "monster"
+      ],
+      "role": "dps",
+      "range": "ranged",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 900,
+        "atk": 75,
+        "def": 40,
+        "spd": 52
+      },
+      "skills": [
+        {
+          "id": "frozen_riddle",
+          "nameKey": "skill.frozen_riddle.name",
+          "descKey": "skill.frozen_riddle.desc",
+          "type": "stun",
+          "duration": 1,
+          "cooldown": 4
+        }
+      ],
+      "ultimate": {
+        "id": "blizzard_riddle",
+        "nameKey": "skill.blizzard_riddle.name",
+        "descKey": "skill.blizzard_riddle.desc",
+        "type": "damage_all",
+        "power": 0.8
+      },
+      "ai": true
     }
   ]
 }

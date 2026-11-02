@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
-import 'core/content.dart';
-import 'core/models.dart';
-import 'l10n/strings.dart';
-import 'ui/battle_screen.dart';
+import 'game_content.dart';
+import 'ui/squad_screen.dart';
 
 void main() => runApp(const TheomythApp());
 
@@ -26,22 +23,6 @@ class TheomythApp extends StatelessWidget {
   }
 }
 
-class _Content {
-  const _Content(this.heroes, this.monsters, this.strings);
-
-  final List<Unit> heroes;
-  final List<Unit> monsters;
-  final Strings strings;
-}
-
-Future<_Content> _loadContent() async {
-  final heroes = parseUnits(await rootBundle.loadString('assets/data/heroes.json'));
-  final monsters =
-      parseUnits(await rootBundle.loadString('assets/data/monsters.json'));
-  final strings = await Strings.load();
-  return _Content(heroes, monsters, strings);
-}
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -50,13 +31,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final Future<_Content> _content = _loadContent();
+  late final Future<GameContent> _content = loadGameContent();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FutureBuilder<_Content>(
+        child: FutureBuilder<GameContent>(
           future: _content,
           builder: (context, snap) {
             final c = snap.data;
@@ -80,11 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: c == null
                         ? null
                         : () => Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => BattleScreen(
-                                heroes: c.heroes,
-                                enemies: c.monsters,
-                                strings: c.strings,
-                              ),
+                              builder: (_) => SquadScreen(content: c),
                             )),
                     child: Text(c?.strings.t('ui.battle') ?? '...'),
                   ),

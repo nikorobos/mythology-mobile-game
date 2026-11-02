@@ -11,7 +11,8 @@ void main() {
       parseUnits(File('assets/data/monsters.json').readAsStringSync());
 
   test('content parses into units', () {
-    expect(heroes.length, 3);
+    expect(heroes.length, 9);
+    expect(monsters.length, 6);
     expect(monsters.every((m) => m.ai), isTrue);
     expect(heroes.first.role, Role.tank);
   });
@@ -154,6 +155,69 @@ void main() {
       final casts = b.events.where((e) => e.skillId == 'u').toList();
       expect(casts.first.round, 4);
     });
+  });
+
+  test('shield absorbs damage', () {
+    final shielder = mk('shielder', Range.melee, 100, 1, 100, const [
+      Skill(
+          id: 'sh',
+          nameKey: 'sh',
+          descKey: 'sh',
+          type: SkillType.shield,
+          power: 0.5)
+    ]);
+    final foe = mk('foe', Range.melee, 1000, 30, 1, const []);
+    final r = simulateBattle([shielder], [foe], maxRounds: 1);
+    final foeHit = r.events
+        .where((e) => e.kind == EventKind.attack && e.actorIndex == 1)
+        .first;
+    expect(foeHit.amount, 0);
+    expect(foeHit.targetHpAfter, 100);
+  });
+
+  test('reflect sends damage back', () {
+    final tank = mk('tank', Range.melee, 1000, 1, 100, const [
+      Skill(
+          id: 'rf',
+          nameKey: 'rf',
+          descKey: 'rf',
+          type: SkillType.reflect,
+          power: 0.5,
+          duration: 2)
+    ]);
+    final foe = mk('foe', Range.melee, 1000, 40, 1, const []);
+    final r = simulateBattle([tank], [foe], maxRounds: 1);
+    final last = r.events.last;
+    expect(last.kind, EventKind.attack);
+    expect(last.actorIndex, 0);
+    expect(last.targetIndex, 1);
+    expect(last.amount, 20);
+    expect(last.targetHpAfter, 980);
+  });
+
+  test('silence stops skills but not basic attacks', () {
+    final silencer = mk('silencer', Range.melee, 100000, 1, 100, const [
+      Skill(
+          id: 'si',
+          nameKey: 'si',
+          descKey: 'si',
+          type: SkillType.silence,
+          duration: 2)
+    ]);
+    final foe = mk('foe', Range.melee, 1000, 10, 1, const [
+      Skill(
+          id: 'tri',
+          nameKey: 'tri',
+          descKey: 'tri',
+          type: SkillType.damageMulti,
+          hits: 3)
+    ]);
+    final r = simulateBattle([silencer], [foe], maxRounds: 1);
+    final foeAttacks = r.events
+        .where((e) => e.kind == EventKind.attack && e.actorIndex == 1)
+        .toList();
+    expect(foeAttacks.length, 1);
+    expect(foeAttacks.first.skillId, isNull);
   });
 
   test('stronger side wins', () {

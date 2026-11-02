@@ -15,6 +15,9 @@ enum SkillType {
   taunt,
   stun,
   buffAtk,
+  shield,
+  reflect,
+  silence,
 }
 
 T _enumByName<T extends Enum>(List<T> values, String name) =>
@@ -30,6 +33,9 @@ SkillType _skillType(String? name) => switch (name) {
       'taunt' => SkillType.taunt,
       'stun' => SkillType.stun,
       'buff_atk' => SkillType.buffAtk,
+      'shield' => SkillType.shield,
+      'reflect' => SkillType.reflect,
+      'silence' => SkillType.silence,
       _ => throw FormatException('Unknown skill type "$name"'),
     };
 
@@ -56,7 +62,8 @@ class Stats {
 
 /// Data-driven skill. Meaning of [power] depends on [type]:
 /// damageMulti = ATK multiplier per hit, heal = fraction of target max HP,
-/// buffAtk = ATK bonus fraction. [duration] is in the owner's turns.
+/// buffAtk = ATK bonus fraction, shield = fraction of max HP absorbed,
+/// reflect = fraction of damage taken sent back. [duration] is in turns.
 class Skill {
   const Skill({
     required this.id,

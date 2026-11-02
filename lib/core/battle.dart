@@ -10,7 +10,17 @@ import 'models.dart';
 
 enum Side { heroes, enemies }
 
-enum EventKind { attack, heal, stun, skip, taunt, buff }
+enum EventKind {
+  attack,
+  heal,
+  stun,
+  skip,
+  taunt,
+  buff,
+  shield,
+  reflect,
+  silence,
+}
 
 const int maxEnergy = 100;
 const int _energyPerAction = 25;
@@ -31,6 +41,10 @@ class Combatant {
   int tauntTurns = 0;
   int buffTurns = 0;
   double buffPct = 0;
+  int silenceTurns = 0;
+  int reflectTurns = 0;
+  double reflectPct = 0;
+  int shield = 0;
 
   bool get alive => hp > 0;
 
@@ -183,11 +197,23 @@ class Battle {
 
   void _hit(Combatant actor, Combatant target, int atk, {String? skillId}) {
     final dmg = calcDamage(atk, target.unit.baseStats.def);
-    target.hp = max(0, target.hp - dmg);
+    final absorbed = min(target.shield, dmg);
+    target.shield -= absorbed;
+    final taken = dmg - absorbed;
+    target.hp = max(0, target.hp - taken);
     if (target.alive) {
       target.energy = min(maxEnergy, target.energy + _energyPerHit);
     }
-    _emit(EventKind.attack, actor, target, dmg, skillId: skillId);
+    _emit(EventKind.attack, actor, target, taken, skillId: skillId);
+
+    // Reflect: part of the damage taken goes back (no chain reaction).
+    if (target.reflectTurns > 0 && taken > 0 && actor.alive) {
+      final back = (taken * target.reflectPct).round();
+      if (back > 0) {
+        actor.hp = max(0, actor.hp - back);
+        _emit(EventKind.attack, target, actor, back);
+      }
+    }
   }
 
   int _heal(Combatant actor, Combatant target, double fraction,
@@ -207,6 +233,7 @@ class Battle {
     actor.cooldowns.updateAll((_, v) => v > 0 ? v - 1 : 0);
     if (actor.tauntTurns > 0) actor.tauntTurns--;
     if (actor.buffTurns > 0) actor.buffTurns--;
+    if (actor.reflectTurns > 0) actor.reflectTurns--;
 
     if (actor.stunTurns > 0) {
       actor.stunTurns--;
@@ -214,8 +241,13 @@ class Battle {
       return;
     }
 
+    // Silenced units can only use basic attacks.
+    final silenced = actor.silenceTurns > 0;
+    if (silenced) actor.silenceTurns--;
+
     final ult = actor.unit.ultimate;
-    if (ult != null &&
+    if (!silenced &&
+        ult != null &&
         actor.energy >= maxEnergy &&
         (actor.side == Side.enemies || auto || actor.ultQueued)) {
       if (_useSkill(actor, ult, allies, foes)) {
@@ -227,6 +259,7 @@ class Battle {
 
     var acted = false;
     for (final skill in actor.unit.skills) {
+      if (silenced) break;
       if ((actor.cooldowns[skill.id] ?? 0) > 0) continue;
       if (_useSkill(actor, skill, allies, foes)) {
         actor.cooldowns[skill.id] = skill.cooldown;
@@ -256,7 +289,7 @@ class Battle {
           if (c.hp < target.hp) target = c;
         }
         final atk = (actor.atk * skill.power).round();
-        for (var i = 0; i < skill.hits && target.alive; i++) {
+        for (var i = 0; i < skill.hits && target.alive && actor.alive; i++) {
           _hit(actor, target, atk, skillId: skill.id);
         }
         return true;
@@ -265,6 +298,7 @@ class Battle {
         if (alive.isEmpty) return false;
         final atk = (actor.atk * skill.power).round();
         for (final c in alive) {
+          if (!actor.alive) break;
           _hit(actor, c, atk, skillId: skill.id);
         }
         return true;
@@ -311,6 +345,33 @@ class Battle {
           c.buffTurns = skill.duration;
           _emit(EventKind.buff, actor, c, skill.duration, skillId: skill.id);
         }
+        return true;
+      case SkillType.shield:
+        for (final c in allies) {
+          if (!c.alive) continue;
+          c.shield = max(c.shield, (c.unit.baseStats.hp * skill.power).round());
+          _emit(EventKind.shield, actor, c, c.shield, skillId: skill.id);
+        }
+        return true;
+      case SkillType.reflect:
+        actor.reflectTurns = skill.duration;
+        actor.reflectPct = skill.power;
+        _emit(EventKind.reflect, actor, actor, skill.duration,
+            skillId: skill.id);
+        return true;
+      case SkillType.silence:
+        Combatant? target;
+        for (final c in foes) {
+          if (!c.alive || c.silenceTurns > 0) continue;
+          if (target == null ||
+              c.unit.baseStats.atk > target.unit.baseStats.atk) {
+            target = c;
+          }
+        }
+        if (target == null) return false;
+        target.silenceTurns = skill.duration;
+        _emit(EventKind.silence, actor, target, skill.duration,
+            skillId: skill.id);
         return true;
     }
   }

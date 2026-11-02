@@ -2,25 +2,317 @@
   "_note": "PLACEHOLDER stats for prototype only. Real values come from balance data.",
   "units": [
     {
-      "id": "heracles", "nameKey": "hero.heracles.name", "mythology": "greek",
-      "tags": ["greek"], "role": "tank", "range": "melee", "rarity": "epic",
-      "baseStats": {"hp": 1200, "atk": 60, "def": 80, "spd": 40},
-      "skills": [{"id": "nemean_guard", "nameKey": "skill.nemean_guard.name", "descKey": "skill.nemean_guard.desc", "type": "taunt", "duration": 2, "cooldown": 3}],
-      "ultimate": {"id": "twelve_labors", "nameKey": "skill.twelve_labors.name", "descKey": "skill.twelve_labors.desc", "type": "damage_all", "power": 1.5}
+      "id": "heracles",
+      "nameKey": "hero.heracles.name",
+      "mythology": "greek",
+      "tags": [
+        "greek"
+      ],
+      "role": "tank",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1200,
+        "atk": 60,
+        "def": 80,
+        "spd": 40
+      },
+      "skills": [
+        {
+          "id": "nemean_guard",
+          "nameKey": "skill.nemean_guard.name",
+          "descKey": "skill.nemean_guard.desc",
+          "type": "taunt",
+          "duration": 2,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "twelve_labors",
+        "nameKey": "skill.twelve_labors.name",
+        "descKey": "skill.twelve_labors.desc",
+        "type": "damage_all",
+        "power": 1.5
+      }
     },
     {
-      "id": "achilles", "nameKey": "hero.achilles.name", "mythology": "greek",
-      "tags": ["greek"], "role": "dps", "range": "melee", "rarity": "epic",
-      "baseStats": {"hp": 800, "atk": 110, "def": 40, "spd": 60},
-      "skills": [{"id": "wrath_of_troy", "nameKey": "skill.wrath_of_troy.name", "descKey": "skill.wrath_of_troy.desc", "type": "damage_multi", "hits": 3, "power": 0.6, "cooldown": 3}],
-      "ultimate": {"id": "spear_of_peleus", "nameKey": "skill.spear_of_peleus.name", "descKey": "skill.spear_of_peleus.desc", "type": "damage_multi", "hits": 5, "power": 0.9}
+      "id": "achilles",
+      "nameKey": "hero.achilles.name",
+      "mythology": "greek",
+      "tags": [
+        "greek"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 800,
+        "atk": 110,
+        "def": 40,
+        "spd": 60
+      },
+      "skills": [
+        {
+          "id": "wrath_of_troy",
+          "nameKey": "skill.wrath_of_troy.name",
+          "descKey": "skill.wrath_of_troy.desc",
+          "type": "damage_multi",
+          "hits": 3,
+          "power": 0.6,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "spear_of_peleus",
+        "nameKey": "skill.spear_of_peleus.name",
+        "descKey": "skill.spear_of_peleus.desc",
+        "type": "damage_multi",
+        "hits": 5,
+        "power": 0.9
+      }
     },
     {
-      "id": "asclepius", "nameKey": "hero.asclepius.name", "mythology": "greek",
-      "tags": ["greek"], "role": "healer", "range": "ranged", "rarity": "rare",
-      "baseStats": {"hp": 700, "atk": 40, "def": 30, "spd": 50},
-      "skills": [{"id": "serpents_remedy", "nameKey": "skill.serpents_remedy.name", "descKey": "skill.serpents_remedy.desc", "type": "heal", "power": 0.25, "cooldown": 3}],
-      "ultimate": {"id": "rod_of_asclepius", "nameKey": "skill.rod_of_asclepius.name", "descKey": "skill.rod_of_asclepius.desc", "type": "heal_all", "power": 0.35}
+      "id": "asclepius",
+      "nameKey": "hero.asclepius.name",
+      "mythology": "greek",
+      "tags": [
+        "greek"
+      ],
+      "role": "healer",
+      "range": "ranged",
+      "rarity": "rare",
+      "baseStats": {
+        "hp": 700,
+        "atk": 40,
+        "def": 30,
+        "spd": 50
+      },
+      "skills": [
+        {
+          "id": "serpents_remedy",
+          "nameKey": "skill.serpents_remedy.name",
+          "descKey": "skill.serpents_remedy.desc",
+          "type": "heal",
+          "power": 0.25,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "rod_of_asclepius",
+        "nameKey": "skill.rod_of_asclepius.name",
+        "descKey": "skill.rod_of_asclepius.desc",
+        "type": "heal_all",
+        "power": 0.35
+      }
+    },
+    {
+      "id": "tyr",
+      "nameKey": "hero.tyr.name",
+      "mythology": "norse",
+      "tags": [
+        "norse"
+      ],
+      "role": "tank",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1150,
+        "atk": 55,
+        "def": 85,
+        "spd": 38
+      },
+      "skills": [
+        {
+          "id": "oath_of_iron",
+          "nameKey": "skill.oath_of_iron.name",
+          "descKey": "skill.oath_of_iron.desc",
+          "type": "shield",
+          "power": 0.12,
+          "cooldown": 4
+        }
+      ],
+      "ultimate": {
+        "id": "doom_of_oathbreakers",
+        "nameKey": "skill.doom_of_oathbreakers.name",
+        "descKey": "skill.doom_of_oathbreakers.desc",
+        "type": "damage_all",
+        "power": 1.0
+      }
+    },
+    {
+      "id": "thor",
+      "nameKey": "hero.thor.name",
+      "mythology": "norse",
+      "tags": [
+        "norse"
+      ],
+      "role": "dps",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 900,
+        "atk": 105,
+        "def": 45,
+        "spd": 55
+      },
+      "skills": [
+        {
+          "id": "storm_strike",
+          "nameKey": "skill.storm_strike.name",
+          "descKey": "skill.storm_strike.desc",
+          "type": "damage_all",
+          "power": 0.6,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "mjolnir_wrath",
+        "nameKey": "skill.mjolnir_wrath.name",
+        "descKey": "skill.mjolnir_wrath.desc",
+        "type": "damage_multi",
+        "hits": 4,
+        "power": 1.2
+      }
+    },
+    {
+      "id": "freya",
+      "nameKey": "hero.freya.name",
+      "mythology": "norse",
+      "tags": [
+        "norse"
+      ],
+      "role": "healer",
+      "range": "ranged",
+      "rarity": "rare",
+      "baseStats": {
+        "hp": 700,
+        "atk": 40,
+        "def": 30,
+        "spd": 52
+      },
+      "skills": [
+        {
+          "id": "falcons_grace",
+          "nameKey": "skill.falcons_grace.name",
+          "descKey": "skill.falcons_grace.desc",
+          "type": "heal_all",
+          "power": 0.12,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "valkyries_call",
+        "nameKey": "skill.valkyries_call.name",
+        "descKey": "skill.valkyries_call.desc",
+        "type": "buff_atk",
+        "power": 0.4,
+        "duration": 3
+      }
+    },
+    {
+      "id": "sobek",
+      "nameKey": "hero.sobek.name",
+      "mythology": "egyptian",
+      "tags": [
+        "egyptian"
+      ],
+      "role": "tank",
+      "range": "melee",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 1250,
+        "atk": 58,
+        "def": 78,
+        "spd": 36
+      },
+      "skills": [
+        {
+          "id": "nile_armor",
+          "nameKey": "skill.nile_armor.name",
+          "descKey": "skill.nile_armor.desc",
+          "type": "reflect",
+          "power": 0.5,
+          "duration": 2,
+          "cooldown": 4
+        }
+      ],
+      "ultimate": {
+        "id": "crocodile_roll",
+        "nameKey": "skill.crocodile_roll.name",
+        "descKey": "skill.crocodile_roll.desc",
+        "type": "damage_multi",
+        "hits": 3,
+        "power": 1.0
+      }
+    },
+    {
+      "id": "horus",
+      "nameKey": "hero.horus.name",
+      "mythology": "egyptian",
+      "tags": [
+        "egyptian"
+      ],
+      "role": "dps",
+      "range": "ranged",
+      "rarity": "epic",
+      "baseStats": {
+        "hp": 750,
+        "atk": 100,
+        "def": 35,
+        "spd": 62
+      },
+      "skills": [
+        {
+          "id": "falcon_dive",
+          "nameKey": "skill.falcon_dive.name",
+          "descKey": "skill.falcon_dive.desc",
+          "type": "damage_multi",
+          "hits": 2,
+          "power": 1.1,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "sky_strike",
+        "nameKey": "skill.sky_strike.name",
+        "descKey": "skill.sky_strike.desc",
+        "type": "damage_all",
+        "power": 1.3
+      }
+    },
+    {
+      "id": "thoth",
+      "nameKey": "hero.thoth.name",
+      "mythology": "egyptian",
+      "tags": [
+        "egyptian"
+      ],
+      "role": "support",
+      "range": "ranged",
+      "rarity": "rare",
+      "baseStats": {
+        "hp": 720,
+        "atk": 45,
+        "def": 32,
+        "spd": 48
+      },
+      "skills": [
+        {
+          "id": "curse_of_words",
+          "nameKey": "skill.curse_of_words.name",
+          "descKey": "skill.curse_of_words.desc",
+          "type": "silence",
+          "duration": 2,
+          "cooldown": 3
+        }
+      ],
+      "ultimate": {
+        "id": "word_of_power",
+        "nameKey": "skill.word_of_power.name",
+        "descKey": "skill.word_of_power.desc",
+        "type": "damage_all",
+        "power": 0.9
+      }
     }
   ]
 }

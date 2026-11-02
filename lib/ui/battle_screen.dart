@@ -136,12 +136,17 @@ class _BattleScreenState extends State<BattleScreen> {
   (String, Color) _floating(BattleEvent e) {
     final s = widget.strings;
     return switch (e.kind) {
-      EventKind.attack => ('-${e.amount}', _red),
+      EventKind.attack => e.amount == 0
+          ? (s.t('status.block'), _muted)
+          : ('-${e.amount}', _red),
       EventKind.heal => ('+${e.amount}', _green),
       EventKind.stun => (s.t('status.stun'), _gold),
       EventKind.skip => (s.t('status.skip'), _gold),
       EventKind.taunt => (s.t('status.taunt'), _gold),
       EventKind.buff => (s.t('status.buff'), _gold),
+      EventKind.shield => (s.t('status.shield'), _gold),
+      EventKind.reflect => (s.t('status.reflect'), _gold),
+      EventKind.silence => (s.t('status.silence'), _gold),
     };
   }
 
