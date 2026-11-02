@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart' show TickerCanceled;
 
 import '../game_content.dart';
 import '../l10n/strings.dart';
