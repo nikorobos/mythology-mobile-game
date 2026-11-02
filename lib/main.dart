@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'game_content.dart';
 import 'ui/squad_screen.dart';
+import 'ui/summon_screen.dart';
 
 void main() => runApp(const TheomythApp());
 
@@ -64,6 +65,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               builder: (_) => SquadScreen(session: session),
                             )),
                     child: Text(session?.content.strings.t('ui.battle') ?? '...'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: 220,
+                  height: 52,
+                  child: OutlinedButton(
+                    onPressed: session == null
+                        ? null
+                        : () => Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => SummonScreen(session: session),
+                            )),
+                    child:
+                        Text(session?.content.strings.t('ui.summon') ?? '...'),
                   ),
                 ),
               ],

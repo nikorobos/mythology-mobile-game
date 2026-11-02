@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' show Random;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:theomyth/core/battle.dart';
@@ -290,7 +291,7 @@ void main() {
     });
 
     test('level up spends gold and needs enough gold', () {
-      final p = PlayerState(gold: 150);
+      final p = PlayerState(gold: 150, stars: {'heracles': 1});
       expect(p.levelUp('heracles', eco), isTrue);
       expect(p.levelOf('heracles'), 2);
       expect(p.gold, 50);
@@ -298,27 +299,123 @@ void main() {
       expect(p.levelOf('heracles'), 2);
     });
 
-    test('battle result: gold always, stage only on a win', () {
+    test('battle result: gold always, stage and gems only on a first win', () {
       final p = PlayerState.initial(eco);
       expect(p.nextStage, 1);
-      p.recordBattle(stage: 1, won: false, economy: eco);
+      final lost = p.recordBattle(
+          stage: 1, won: false, isBoss: false, economy: eco);
+      expect(lost.gold, 10);
+      expect(lost.gems, 0);
       expect(p.nextStage, 1);
-      expect(p.gold, eco.startGold + 10);
-      p.recordBattle(stage: 1, won: true, economy: eco);
+      final won = p.recordBattle(
+          stage: 1, won: true, isBoss: false, economy: eco);
+      expect(won.gems, eco.stageClearGems);
       expect(p.nextStage, 2);
-      p.recordBattle(stage: 1, won: true, economy: eco); // replay older stage
+      final replay = p.recordBattle(
+          stage: 1, won: true, isBoss: false, economy: eco);
+      expect(replay.gems, 0); // no gems for replaying
       expect(p.highestStageCleared, 1);
+      final boss = p.recordBattle(
+          stage: 2, won: true, isBoss: true, economy: eco);
+      expect(boss.gems, eco.bossClearGems);
     });
 
-    test('save JSON round trip, missing keys fall back', () {
-      final p = PlayerState(gold: 7, heroLevels: {'thor': 4}, highestStageCleared: 3);
-      final back = PlayerState.fromJson(p.toJson());
+    test('save JSON round trip, v1 saves get starters', () {
+      final p = PlayerState(
+        gold: 7,
+        gems: 5,
+        heroLevels: {'thor': 4},
+        stars: {'thor': 2},
+        shards: {'thor': 5},
+        pity: 3,
+        highestStageCleared: 3,
+      );
+      final back = PlayerState.fromJson(p.toJson(), eco);
       expect(back.gold, 7);
+      expect(back.gems, 5);
       expect(back.levelOf('thor'), 4);
+      expect(back.starsOf('thor'), 2);
+      expect(back.shardsOf('thor'), 5);
+      expect(back.pity, 3);
       expect(back.highestStageCleared, 3);
-      final empty = PlayerState.fromJson({});
-      expect(empty.gold, 0);
-      expect(empty.levelOf('thor'), 1);
+      final old = PlayerState.fromJson({'gold': 9, 'highestStageCleared': 2}, eco);
+      expect(old.gold, 9);
+      expect(old.gems, eco.startGems);
+      for (final id in eco.starterHeroes) {
+        expect(old.owns(id), isTrue);
+      }
+      expect(old.owns('thor'), isFalse);
+    });
+
+    test('starters exist in hero data', () {
+      for (final id in eco.starterHeroes) {
+        expect(heroes.any((h) => h.id == id), isTrue, reason: id);
+      }
+    });
+
+    test('summon needs gems and spends them', () {
+      final p = PlayerState(gems: 99);
+      expect(p.summon(1, heroes, eco, Random(1)), isNull);
+      expect(p.gems, 99);
+      p.gems = 100;
+      final r = p.summon(1, heroes, eco, Random(1))!;
+      expect(r.length, 1);
+      expect(p.gems, 0);
+      expect(p.owns(r.first.heroId), isTrue);
+      expect(r.first.isNew, isTrue);
+    });
+
+    test('x10 costs the discounted price and gives 10 results', () {
+      final p = PlayerState(gems: eco.summonTenCost);
+      final r = p.summon(10, heroes, eco, Random(2))!;
+      expect(r.length, 10);
+      expect(p.gems, 0);
+    });
+
+    test('duplicates give shards, not new heroes', () {
+      final p = PlayerState(
+          gems: 1000, stars: {for (final h in heroes) h.id: 1});
+      final r = p.summon(1, heroes, eco, Random(3))!;
+      expect(r.first.isNew, isFalse);
+      expect(r.first.shardsGained, eco.dupShards);
+      expect(p.shardsOf(r.first.heroId), eco.dupShards);
+    });
+
+    test('pity guarantees an epic', () {
+      const rareOnly = Economy(
+        rarityWeights: {'rare': 100, 'epic': 0},
+        pityEpic: 5,
+        summonSingleCost: 1,
+        summonTenCost: 10,
+      );
+      final p = PlayerState(gems: 100);
+      final res = p.summon(5, heroes, rareOnly, Random(7))!;
+      Rarity rarityOf(SummonResult r) =>
+          heroes.firstWhere((h) => h.id == r.heroId).rarity;
+      for (final r in res.take(4)) {
+        expect(rarityOf(r), Rarity.rare);
+      }
+      expect(rarityOf(res.last), Rarity.epic);
+      expect(p.pity, 0);
+    });
+
+    test('star up spends shards, stops at max stars', () {
+      final p = PlayerState(stars: {'thor': 1}, shards: {'thor': 10});
+      expect(p.canStarUp('thor', eco), isTrue);
+      expect(p.starUp('thor', eco), isTrue);
+      expect(p.starsOf('thor'), 2);
+      expect(p.shardsOf('thor'), 0);
+      expect(p.canStarUp('thor', eco), isFalse);
+      p.stars['thor'] = eco.maxStars;
+      p.shards['thor'] = 9999;
+      expect(p.canStarUp('thor', eco), isFalse);
+      expect(p.canStarUp('not_owned', eco), isFalse);
+    });
+
+    test('stars scale stats', () {
+      final h = heroes.first;
+      final s3 = unitAtLevel(h, 1, eco, stars: 3);
+      expect(s3.baseStats.hp, (h.baseStats.hp * 1.4).round());
     });
   });
 

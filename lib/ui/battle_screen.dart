@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../core/battle.dart';
 import '../core/format.dart';
 import '../core/models.dart';
+import '../core/player.dart';
 import '../l10n/strings.dart';
 
 const _bg = Color(0xFF14122B);
@@ -36,8 +37,8 @@ class BattleScreen extends StatefulWidget {
   final List<Unit> enemies;
   final Strings strings;
 
-  /// Called once per finished fight; returns the gold earned.
-  final int Function(bool won) onFinished;
+  /// Called once per finished fight; returns the rewards earned.
+  final BattleReward Function(bool won) onFinished;
 
   @override
   State<BattleScreen> createState() => _BattleScreenState();
@@ -54,7 +55,7 @@ class _BattleScreenState extends State<BattleScreen> {
   int _speedIndex = 0;
   bool _auto = false;
   bool _done = false;
-  int? _reward;
+  BattleReward? _reward;
   BattleEvent? _current;
 
   List<Unit> get _units => [...widget.heroes, ...widget.enemies];
@@ -203,7 +204,8 @@ class _BattleScreenState extends State<BattleScreen> {
                                   fontWeight: FontWeight.w900)),
                           if (_reward != null)
                             Text(
-                                '+${formatNumber(_reward!)} ${s.t('ui.gold')}',
+                                '+${formatNumber(_reward!.gold)} ${s.t('ui.gold')}'
+                                '${_reward!.gems > 0 ? '   +${formatNumber(_reward!.gems)} ${s.t('ui.gems')}' : ''}',
                                 style: const TextStyle(
                                     color: _cream,
                                     fontSize: 16,

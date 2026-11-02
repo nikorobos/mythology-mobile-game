@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:math' show Random;
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/economy.dart';
+import '../core/models.dart';
 import '../core/player.dart';
 
 /// Holds the player's progress, saves it locally after every change.
@@ -24,7 +26,8 @@ class PlayerController extends ChangeNotifier {
       final raw = prefs.getString(_key);
       state = raw == null
           ? PlayerState.initial(economy)
-          : PlayerState.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+          : PlayerState.fromJson(
+              jsonDecode(raw) as Map<String, dynamic>, economy);
     } catch (_) {
       // Corrupt save: start fresh rather than crash.
       state = PlayerState.initial(economy);
@@ -43,10 +46,34 @@ class PlayerController extends ChangeNotifier {
     return ok;
   }
 
-  /// Returns the gold earned.
-  int recordBattle({required int stage, required bool won}) {
-    final reward =
-        state.recordBattle(stage: stage, won: won, economy: economy);
+  bool starUp(String heroId) {
+    final ok = state.starUp(heroId, economy);
+    if (ok) {
+      _save();
+      notifyListeners();
+    }
+    return ok;
+  }
+
+  final Random _random = Random();
+
+  /// Null if not enough gems.
+  List<SummonResult>? summon(int count, List<Unit> heroes) {
+    final results = state.summon(count, heroes, economy, _random);
+    if (results != null) {
+      _save();
+      notifyListeners();
+    }
+    return results;
+  }
+
+  BattleReward recordBattle({
+    required int stage,
+    required bool won,
+    required bool isBoss,
+  }) {
+    final reward = state.recordBattle(
+        stage: stage, won: won, isBoss: isBoss, economy: economy);
     _save();
     notifyListeners();
     return reward;

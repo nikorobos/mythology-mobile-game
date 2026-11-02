@@ -111,5 +111,21 @@
   "ui.chapter": "Κεφάλαιο",
   "ui.gold": "Χρυσός",
   "ui.level": "Επ.",
-  "ui.level_up": "Αναβάθμιση"
+  "ui.level_up": "Αναβάθμιση",
+  "ui.summon": "Επίκληση",
+  "ui.gems": "Πετράδια",
+  "ui.new": "ΝΕΟΣ",
+  "ui.shards": "Θραύσματα",
+  "ui.stars": "Αστέρια",
+  "ui.star_up": "Αστέρι+",
+  "ui.pity": "Εγγυημένο Epic μέσα σε",
+  "ui.pulls": "κλήσεις",
+  "ui.not_enough_gems": "Δεν έχεις αρκετά πετράδια",
+  "ui.summon_x1": "Επίκληση x1",
+  "ui.summon_x10": "Επίκληση x10",
+  "ui.no_heroes": "Δεν έχεις ήρωες ακόμα. Κάνε επίκληση!",
+  "rarity.common": "Κοινός",
+  "rarity.rare": "Σπάνιος",
+  "rarity.epic": "Επικός",
+  "rarity.legendary": "Θρυλικός"
 }

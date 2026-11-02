@@ -111,5 +111,21 @@
   "ui.chapter": "Chapter",
   "ui.gold": "Gold",
   "ui.level": "Lv",
-  "ui.level_up": "Level up"
+  "ui.level_up": "Level up",
+  "ui.summon": "Summon",
+  "ui.gems": "Gems",
+  "ui.new": "NEW",
+  "ui.shards": "Shards",
+  "ui.stars": "Stars",
+  "ui.star_up": "Star up",
+  "ui.pity": "Epic guaranteed within",
+  "ui.pulls": "pulls",
+  "ui.not_enough_gems": "Not enough gems",
+  "ui.summon_x1": "Summon x1",
+  "ui.summon_x10": "Summon x10",
+  "ui.no_heroes": "No heroes yet. Summon some!",
+  "rarity.common": "Common",
+  "rarity.rare": "Rare",
+  "rarity.epic": "Epic",
+  "rarity.legendary": "Legendary"
 }

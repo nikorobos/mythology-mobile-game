@@ -25,9 +25,12 @@ class SquadScreen extends StatefulWidget {
 }
 
 class _SquadScreenState extends State<SquadScreen> {
-  // Default squad: the first three heroes.
-  late final Set<String> _selected =
-      widget.session.content.heroes.take(3).map((h) => h.id).toSet();
+  // Default squad: the first three owned heroes.
+  late final Set<String> _selected = widget.session.content.heroes
+      .where((h) => widget.session.player.state.owns(h.id))
+      .take(3)
+      .map((h) => h.id)
+      .toSet();
 
   /// null = follow the highest stage the player may attempt.
   int? _stage;
@@ -54,7 +57,8 @@ class _SquadScreenState extends State<SquadScreen> {
                 padding: const EdgeInsets.only(right: 16),
                 child: Center(
                   child: Text(
-                    '${s.t('ui.gold')}: ${formatNumber(player.state.gold)}',
+                    '${s.t('ui.gold')}: ${formatNumber(player.state.gold)}   '
+                    '${s.t('ui.gems')}: ${formatNumber(player.state.gems)}',
                     style: const TextStyle(
                         color: _gold, fontWeight: FontWeight.w900),
                   ),
@@ -141,16 +145,20 @@ class _SquadScreenState extends State<SquadScreen> {
                                 builder: (_) => BattleScreen(
                                   heroes: [
                                     for (final h in c.heroes)
-                                      if (_selected.contains(h.id))
+                                      if (_selected.contains(h.id) &&
+                                          player.state.owns(h.id))
                                         unitAtLevel(
                                             h,
                                             player.state.levelOf(h.id),
-                                            c.economy)
+                                            c.economy,
+                                            stars: player.state.starsOf(h.id))
                                   ],
                                   enemies: c.enemiesForStage(stage),
                                   strings: s,
                                   onFinished: (won) => player.recordBattle(
-                                      stage: stage, won: won),
+                                      stage: stage,
+                                      won: won,
+                                      isBoss: c.isBoss(stage)),
                                 ),
                               )),
                       child: Text(s.t('ui.battle')),
@@ -170,14 +178,26 @@ class _SquadScreenState extends State<SquadScreen> {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       children: [
-        for (final h in c.heroes) _heroTile(c, player, h, s),
+        if (!c.heroes.any((h) => player.state.owns(h.id)))
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Center(
+              child: Text(s.t('ui.no_heroes'),
+                  style: const TextStyle(color: _muted)),
+            ),
+          ),
+        for (final h in c.heroes)
+          if (player.state.owns(h.id)) _heroTile(c, player, h, s),
       ],
     );
   }
 
   Widget _heroTile(GameContent c, PlayerController player, Unit h, Strings s) {
     final level = player.state.levelOf(h.id);
-    final stats = unitAtLevel(h, level, c.economy).baseStats;
+    final stars = player.state.starsOf(h.id);
+    final stats = unitAtLevel(h, level, c.economy, stars: stars).baseStats;
+    final starCost = c.economy.starUpCost(stars);
+    final canStar = player.state.canStarUp(h.id, c.economy);
     final canUp = player.state.canLevelUp(h.id, c.economy);
     final maxed = level >= c.economy.maxLevel;
     final cost = c.economy.levelUpCost(level);
@@ -194,9 +214,21 @@ class _SquadScreenState extends State<SquadScreen> {
             _selected.remove(h.id);
           }
         }),
-        title: Text('${s.t(h.nameKey)}  ${s.t('ui.level')} $level',
-            style:
-                const TextStyle(color: _cream, fontWeight: FontWeight.w800)),
+        title: Row(
+          children: [
+            Flexible(
+              child: Text('${s.t(h.nameKey)}  ${s.t('ui.level')} $level',
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      color: _cream, fontWeight: FontWeight.w800)),
+            ),
+            const SizedBox(width: 6),
+            const Icon(Icons.star, size: 16, color: _gold),
+            Text('$stars',
+                style: const TextStyle(
+                    color: _gold, fontWeight: FontWeight.w900)),
+          ],
+        ),
         subtitle: Row(
           children: [
             Container(
@@ -216,19 +248,22 @@ class _SquadScreenState extends State<SquadScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                    'HP ${formatNumber(stats.hp)}  ATK ${formatNumber(stats.atk)}',
+                    'HP ${formatNumber(stats.hp)}  ATK ${formatNumber(stats.atk)}'
+                    '${starCost == null ? '' : '  ${s.t('ui.shards')} ${player.state.shardsOf(h.id)}/$starCost'}',
                     style: const TextStyle(color: _muted, fontSize: 12)),
               ),
             ),
           ],
         ),
-        secondary: maxed
-            ? null
-            : FilledButton(
+        secondary: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!maxed)
+              FilledButton(
                 style: FilledButton.styleFrom(
                   backgroundColor: _gold,
                   foregroundColor: _bg,
-                  minimumSize: const Size(64, 40),
+                  minimumSize: const Size(64, 36),
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                 ),
                 onPressed: canUp ? () => player.levelUp(h.id) : null,
@@ -241,6 +276,22 @@ class _SquadScreenState extends State<SquadScreen> {
                   ],
                 ),
               ),
+            if (canStar)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFFB07CFF),
+                    foregroundColor: _bg,
+                    minimumSize: const Size(64, 32),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                  ),
+                  onPressed: () => player.starUp(h.id),
+                  child: const Icon(Icons.star, size: 16),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
