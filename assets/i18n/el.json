@@ -198,5 +198,7 @@
   "ui.in_squad": "Στην ομάδα",
   "ui.add_to_squad": "Πρόσθεσε στην ομάδα",
   "range.melee": "Σώμα με σώμα",
-  "range.ranged": "Εξ αποστάσεως"
+  "range.ranged": "Εξ αποστάσεως",
+  "ui.summon_title": "Κάλεσε τους ήρωες των μύθων",
+  "ui.summon_results": "Κάλεσες"
 }

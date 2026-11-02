@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../game_content.dart';
 import 'heroes_screen.dart';
 import 'home_screen.dart';
-import 'legacy_tabs.dart';
 import 'squad_model.dart';
+import 'summon_screen.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -37,7 +37,7 @@ class _AppShellState extends State<AppShell> {
           // Replaced by the board-styled screens in the next stages.
           HomeScreen(session: widget.session, squad: _squad),
           HeroesScreen(session: widget.session, squad: _squad),
-          LegacySummonTab(session: widget.session),
+          SummonScreen(session: widget.session),
         ],
       ),
       bottomNavigationBar: AppNavBar(

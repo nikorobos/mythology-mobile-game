@@ -198,5 +198,7 @@
   "ui.in_squad": "In squad",
   "ui.add_to_squad": "Add to squad",
   "range.melee": "Melee",
-  "range.ranged": "Ranged"
+  "range.ranged": "Ranged",
+  "ui.summon_title": "Call the heroes of myth",
+  "ui.summon_results": "You summoned"
 }
