@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/economy.dart';
+import '../core/equipment.dart';
 import '../core/format.dart';
 import '../core/models.dart';
 import '../core/stages.dart';
@@ -8,6 +8,7 @@ import '../game_content.dart';
 import '../l10n/strings.dart';
 import '../state/player_controller.dart';
 import 'battle_screen.dart';
+import 'equipment_screen.dart';
 
 const _bg = Color(0xFF14122B);
 const _panel = Color(0xFF1D1A3D);
@@ -147,11 +148,13 @@ class _SquadScreenState extends State<SquadScreen> {
                                     for (final h in c.heroes)
                                       if (_selected.contains(h.id) &&
                                           player.state.owns(h.id))
-                                        unitAtLevel(
+                                        unitWithEquipment(
                                             h,
                                             player.state.levelOf(h.id),
                                             c.economy,
-                                            stars: player.state.starsOf(h.id))
+                                            stars: player.state.starsOf(h.id),
+                                            bonus: player.state
+                                                .bonusFor(h.id, c.equipment))
                                   ],
                                   enemies: c.enemiesForStage(stage),
                                   strings: s,
@@ -195,7 +198,9 @@ class _SquadScreenState extends State<SquadScreen> {
   Widget _heroTile(GameContent c, PlayerController player, Unit h, Strings s) {
     final level = player.state.levelOf(h.id);
     final stars = player.state.starsOf(h.id);
-    final stats = unitAtLevel(h, level, c.economy, stars: stars).baseStats;
+    final stats = unitWithEquipment(h, level, c.economy,
+            stars: stars, bonus: player.state.bonusFor(h.id, c.equipment))
+        .baseStats;
     final starCost = c.economy.starUpCost(stars);
     final canStar = player.state.canStarUp(h.id, c.economy);
     final canUp = player.state.canLevelUp(h.id, c.economy);
@@ -285,6 +290,22 @@ class _SquadScreenState extends State<SquadScreen> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: _cream,
+                    side: const BorderSide(color: _muted),
+                    minimumSize: const Size(72, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                  ),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => EquipmentScreen(
+                          session: widget.session, heroId: h.id),
+                    ),
+                  ),
+                  child: const Icon(Icons.shield_outlined, size: 18),
+                ),
+                const SizedBox(height: 4),
                 if (!maxed)
                   FilledButton(
                     style: FilledButton.styleFrom(

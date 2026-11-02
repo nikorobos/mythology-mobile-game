@@ -5,21 +5,24 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/economy.dart';
+import '../core/equipment.dart';
 import '../core/models.dart';
 import '../core/player.dart';
 
 /// Holds the player's progress, saves it locally after every change.
 /// (Cloud save with Firebase comes later; the JSON format stays the same.)
 class PlayerController extends ChangeNotifier {
-  PlayerController._(this._prefs, this.state, this.economy);
+  PlayerController._(this._prefs, this.state, this.economy, this.equipment);
 
   static const _key = 'theomyth_save_v1';
 
   final SharedPreferences _prefs;
   final PlayerState state;
   final Economy economy;
+  final EquipmentConfig equipment;
 
-  static Future<PlayerController> load(Economy economy) async {
+  static Future<PlayerController> load(
+      Economy economy, EquipmentConfig equipment) async {
     final prefs = await SharedPreferences.getInstance();
     PlayerState state;
     try {
@@ -32,7 +35,7 @@ class PlayerController extends ChangeNotifier {
       // Corrupt save: start fresh rather than crash.
       state = PlayerState.initial(economy);
     }
-    final controller = PlayerController._(prefs, state, economy);
+    final controller = PlayerController._(prefs, state, economy, equipment);
     if (state.lastCollectMs == null) {
       // First run (or old save): idle gold starts counting now.
       state.lastCollectMs = controller.nowMs;
@@ -97,9 +100,38 @@ class PlayerController extends ChangeNotifier {
     required bool isBoss,
   }) {
     final reward = state.recordBattle(
-        stage: stage, won: won, isBoss: isBoss, economy: economy);
+        stage: stage,
+        won: won,
+        isBoss: isBoss,
+        economy: economy,
+        equipment: equipment,
+        rnd: _random);
     _save();
     notifyListeners();
     return reward;
+  }
+
+  bool equipItem(String heroId, int itemId) =>
+      _changed(state.equip(heroId, itemId, equipment));
+
+  bool unequipSlot(String heroId, String slot) =>
+      _changed(state.unequip(heroId, slot));
+
+  bool upgradeItem(int itemId) =>
+      _changed(state.upgradeItem(itemId, equipment));
+
+  /// Returns the gold received, or null if the item cannot be sold.
+  int? sellItem(int itemId) {
+    final gold = state.sellItem(itemId, equipment);
+    if (gold != null) _changed(true);
+    return gold;
+  }
+
+  bool _changed(bool ok) {
+    if (ok) {
+      _save();
+      notifyListeners();
+    }
+    return ok;
   }
 }

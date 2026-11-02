@@ -3,13 +3,26 @@
 import 'dart:math' show Random, max, min;
 
 import 'economy.dart';
+import 'equipment.dart';
 import 'models.dart';
 
 class BattleReward {
-  const BattleReward({required this.gold, this.gems = 0});
+  const BattleReward({
+    required this.gold,
+    this.gems = 0,
+    this.drops = const [],
+    this.scrapGold = 0,
+  });
 
   final int gold;
   final int gems;
+
+  /// Items added to the inventory by this battle.
+  final List<Equipment> drops;
+
+  /// Gold from drops that did not fit in a full inventory (already added
+  /// to the player's gold, not included in [gold]).
+  final int scrapGold;
 }
 
 class SummonResult {
@@ -34,9 +47,14 @@ class PlayerState {
     this.pity = 0,
     this.highestStageCleared = 0,
     this.lastCollectMs,
+    List<Equipment>? inventory,
+    Map<String, Map<String, int>>? equipped,
+    this.nextItemId = 1,
   })  : heroLevels = heroLevels ?? {},
         stars = stars ?? {},
-        shards = shards ?? {};
+        shards = shards ?? {},
+        inventory = inventory ?? [],
+        equipped = equipped ?? {};
 
   factory PlayerState.initial(Economy e) => PlayerState(
         gold: e.startGold,
@@ -58,6 +76,15 @@ class PlayerState {
 
   /// When idle gold was last collected (ms since epoch). Null = not started.
   int? lastCollectMs;
+
+  /// Every item the player owns (worn or not).
+  final List<Equipment> inventory;
+
+  /// Hero id -> slot -> item id of the worn item.
+  final Map<String, Map<String, int>> equipped;
+
+  /// Id given to the next item that drops.
+  int nextItemId;
 
   bool owns(String heroId) => stars.containsKey(heroId);
   int starsOf(String heroId) => stars[heroId] ?? 0;
@@ -104,6 +131,8 @@ class PlayerState {
     required bool won,
     required bool isBoss,
     required Economy economy,
+    EquipmentConfig? equipment,
+    Random? rnd,
   }) {
     final goldReward = economy.battleReward(stage, won: won);
     gold += goldReward;
@@ -113,7 +142,101 @@ class PlayerState {
       gemReward = isBoss ? economy.bossClearGems : economy.stageClearGems;
       gems += gemReward;
     }
-    return BattleReward(gold: goldReward, gems: gemReward);
+    final drops = <Equipment>[];
+    var scrap = 0;
+    if (won && equipment != null && rnd != null) {
+      final count = isBoss
+          ? equipment.bossDropCount
+          : (rnd.nextDouble() < equipment.dropChance ? 1 : 0);
+      for (var n = 0; n < count; n++) {
+        final item = equipment.rollItem(nextItemId, stage, rnd, boss: isBoss);
+        if (item == null) continue;
+        nextItemId++;
+        if (inventory.length >= equipment.maxInventory) {
+          // Full inventory: the item turns into gold.
+          scrap += equipment.sellValue(item);
+        } else {
+          inventory.add(item);
+          drops.add(item);
+        }
+      }
+      gold += scrap;
+    }
+    return BattleReward(
+      gold: goldReward,
+      gems: gemReward,
+      drops: drops,
+      scrapGold: scrap,
+    );
+  }
+
+  // ---- equipment ----
+
+  Equipment? itemById(int id) {
+    for (final i in inventory) {
+      if (i.id == id) return i;
+    }
+    return null;
+  }
+
+  /// Hero wearing item [itemId], or null.
+  String? wearerOf(int itemId) {
+    for (final e in equipped.entries) {
+      if (e.value.containsValue(itemId)) return e.key;
+    }
+    return null;
+  }
+
+  /// Items [heroId] wears.
+  List<Equipment> wornBy(String heroId) => [
+        for (final id in (equipped[heroId] ?? const <String, int>{}).values)
+          if (itemById(id) != null) itemById(id)!
+      ];
+
+  /// Item worn in [slot] by [heroId], or null.
+  Equipment? wornInSlot(String heroId, String slot) {
+    final id = equipped[heroId]?[slot];
+    return id == null ? null : itemById(id);
+  }
+
+  EquipBonus bonusFor(String heroId, EquipmentConfig cfg) =>
+      cfg.bonusOf(wornBy(heroId));
+
+  /// Puts item [itemId] on [heroId]. An item worn by another hero moves over;
+  /// the item that was in that slot goes back to the inventory.
+  bool equip(String heroId, int itemId, EquipmentConfig cfg) {
+    final item = itemById(itemId);
+    if (item == null || !owns(heroId)) return false;
+    if (!cfg.slots.contains(item.slot)) return false;
+    final other = wearerOf(itemId);
+    if (other != null) equipped[other]?.remove(item.slot);
+    (equipped[heroId] ??= {})[item.slot] = itemId;
+    return true;
+  }
+
+  bool unequip(String heroId, String slot) =>
+      equipped[heroId]?.remove(slot) != null;
+
+  /// Spends gold to raise an item one level.
+  bool upgradeItem(int itemId, EquipmentConfig cfg) {
+    final item = itemById(itemId);
+    if (item == null) return false;
+    final cost = cfg.upgradeCost(item);
+    if (cost == null || gold < cost) return false;
+    gold -= cost;
+    final index = inventory.indexWhere((i) => i.id == itemId);
+    inventory[index] = item.withLevel(item.level + 1);
+    return true;
+  }
+
+  /// Sells an item that nobody wears. Returns the gold, or null if refused.
+  int? sellItem(int itemId, EquipmentConfig cfg) {
+    final item = itemById(itemId);
+    if (item == null || wearerOf(itemId) != null) return null;
+    final value = cfg.sellValue(item);
+    inventory.removeWhere((i) => i.id == itemId);
+    gold += value;
+    return value;
   }
 
   // ---- summon ----
@@ -188,7 +311,7 @@ class PlayerState {
   // ---- save ----
 
   Map<String, dynamic> toJson() => {
-        'v': 2,
+        'v': 3,
         'gold': gold,
         'gems': gems,
         'heroLevels': heroLevels,
@@ -197,6 +320,9 @@ class PlayerState {
         'pity': pity,
         'highestStageCleared': highestStageCleared,
         'lastCollectMs': lastCollectMs,
+        'items': [for (final i in inventory) i.toJson()],
+        'equipped': equipped,
+        'nextItemId': nextItemId,
       };
 
   /// Older saves (v1) had no stars/gems: they get the starter heroes and
@@ -206,7 +332,33 @@ class PlayerState {
           for (final entry in ((m as Map?) ?? const {}).entries)
             entry.key as String: entry.value as int
         };
+    // v3 added equipment; older saves simply have none.
+    final items = <Equipment>[];
+    for (final raw in (j['items'] as List?) ?? const []) {
+      try {
+        items.add(Equipment.fromJson(raw as Map<String, dynamic>));
+      } catch (_) {
+        // Skip an unreadable item instead of losing the whole save.
+      }
+    }
+    final ids = {for (final i in items) i.id};
+    final worn = <String, Map<String, int>>{};
+    for (final entry in ((j['equipped'] as Map?) ?? const {}).entries) {
+      final slots = <String, int>{};
+      for (final s in (entry.value as Map).entries) {
+        final id = s.value as int;
+        if (ids.contains(id)) slots[s.key as String] = id;
+      }
+      worn[entry.key as String] = slots;
+    }
+    var nextId = (j['nextItemId'] as int?) ?? 1;
+    for (final id in ids) {
+      if (id >= nextId) nextId = id + 1;
+    }
     return PlayerState(
+      inventory: items,
+      equipped: worn,
+      nextItemId: nextId,
       gold: (j['gold'] as int?) ?? 0,
       gems: (j['gems'] as int?) ?? e.startGems,
       heroLevels: ints(j['heroLevels']),

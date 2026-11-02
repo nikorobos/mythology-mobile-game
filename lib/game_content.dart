@@ -2,6 +2,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import 'core/content.dart';
 import 'core/economy.dart';
+import 'core/equipment.dart';
 import 'core/models.dart';
 import 'core/stages.dart';
 import 'l10n/strings.dart';
@@ -16,6 +17,7 @@ class GameContent {
     this.monsters,
     this.stageConfig,
     this.economy,
+    this.equipment,
     this.strings,
   );
 
@@ -23,6 +25,7 @@ class GameContent {
   final List<Unit> monsters;
   final StageConfig stageConfig;
   final Economy economy;
+  final EquipmentConfig equipment;
   final Strings strings;
 
   /// Enemy team for any stage number (endless).
@@ -50,10 +53,12 @@ Future<Session> loadSession() async {
       parseStageConfig(await rootBundle.loadString('assets/data/stages.json'));
   final economy =
       parseEconomy(await rootBundle.loadString('assets/data/economy.json'));
+  final equipment = parseEquipment(
+      await rootBundle.loadString('assets/data/equipment.json'));
   final strings = await Strings.load();
-  final player = await PlayerController.load(economy);
+  final player = await PlayerController.load(economy, equipment);
   return Session(
-    GameContent(heroes, monsters, config, economy, strings),
+    GameContent(heroes, monsters, config, economy, equipment, strings),
     player,
     StubAdService(),
   );

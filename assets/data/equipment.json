@@ -1,0 +1,189 @@
+{
+  "_note": "PLACEHOLDER equipment numbers. Item bonus = slotRules[slot].base * rarityMult[rarity] * (1 + upgradeStatGrowth*level). hp/atk bases are fractions (0.06 = +6%), def/spd are flat. Upgrade cost = upgradeCostBase * rarityMult * upgradeCostGrowth^level. Sell value = sellGoldBase * rarityMult * (1+level). Drops: a won non-boss battle drops 1 item with chance dropChance; a boss win drops bossDropCount items and epic/legendary weights are multiplied by bossEpicBoost. dropTable rows are only used from minStage on. A full inventory (maxInventory) turns new drops into gold.",
+  "slots": [
+    "weapon",
+    "armor",
+    "helm",
+    "boots",
+    "relic",
+    "ring"
+  ],
+  "slotRules": {
+    "weapon": {
+      "stat": "atk",
+      "base": 0.06
+    },
+    "armor": {
+      "stat": "hp",
+      "base": 0.08
+    },
+    "helm": {
+      "stat": "def",
+      "base": 3
+    },
+    "boots": {
+      "stat": "spd",
+      "base": 2
+    },
+    "relic": {
+      "stat": "atk",
+      "base": 0.04
+    },
+    "ring": {
+      "stat": "hp",
+      "base": 0.05
+    }
+  },
+  "rarityMult": {
+    "common": 1.0,
+    "rare": 1.6,
+    "epic": 2.5,
+    "legendary": 4.0
+  },
+  "maxUpgrade": {
+    "common": 5,
+    "rare": 8,
+    "epic": 12,
+    "legendary": 15
+  },
+  "upgradeStatGrowth": 0.15,
+  "upgradeCostBase": 50,
+  "upgradeCostGrowth": 1.25,
+  "sellGoldBase": 10,
+  "maxInventory": 200,
+  "dropChance": 0.35,
+  "bossDropCount": 2,
+  "bossEpicBoost": 3,
+  "dropTable": [
+    {
+      "rarity": "common",
+      "weight": 70,
+      "minStage": 1
+    },
+    {
+      "rarity": "rare",
+      "weight": 25,
+      "minStage": 3
+    },
+    {
+      "rarity": "epic",
+      "weight": 5,
+      "minStage": 10
+    },
+    {
+      "rarity": "legendary",
+      "weight": 1,
+      "minStage": 30
+    }
+  ],
+  "templates": [
+    {
+      "id": "hoplite_spear",
+      "slot": "weapon",
+      "nameKey": "item.hoplite_spear.name",
+      "mythology": "greek"
+    },
+    {
+      "id": "raiders_axe",
+      "slot": "weapon",
+      "nameKey": "item.raiders_axe.name",
+      "mythology": "norse"
+    },
+    {
+      "id": "bronze_khopesh",
+      "slot": "weapon",
+      "nameKey": "item.bronze_khopesh.name",
+      "mythology": "egyptian"
+    },
+    {
+      "id": "bronze_cuirass",
+      "slot": "armor",
+      "nameKey": "item.bronze_cuirass.name",
+      "mythology": "greek"
+    },
+    {
+      "id": "chain_byrnie",
+      "slot": "armor",
+      "nameKey": "item.chain_byrnie.name",
+      "mythology": "norse"
+    },
+    {
+      "id": "scale_corselet",
+      "slot": "armor",
+      "nameKey": "item.scale_corselet.name",
+      "mythology": "egyptian"
+    },
+    {
+      "id": "corinthian_helm",
+      "slot": "helm",
+      "nameKey": "item.corinthian_helm.name",
+      "mythology": "greek"
+    },
+    {
+      "id": "iron_helm",
+      "slot": "helm",
+      "nameKey": "item.iron_helm.name",
+      "mythology": "norse"
+    },
+    {
+      "id": "nemes_headdress",
+      "slot": "helm",
+      "nameKey": "item.nemes_headdress.name",
+      "mythology": "egyptian"
+    },
+    {
+      "id": "messenger_sandals",
+      "slot": "boots",
+      "nameKey": "item.messenger_sandals.name",
+      "mythology": "greek"
+    },
+    {
+      "id": "fur_boots",
+      "slot": "boots",
+      "nameKey": "item.fur_boots.name",
+      "mythology": "norse"
+    },
+    {
+      "id": "papyrus_sandals",
+      "slot": "boots",
+      "nameKey": "item.papyrus_sandals.name",
+      "mythology": "egyptian"
+    },
+    {
+      "id": "olive_wreath",
+      "slot": "relic",
+      "nameKey": "item.olive_wreath.name",
+      "mythology": "greek"
+    },
+    {
+      "id": "rune_stone",
+      "slot": "relic",
+      "nameKey": "item.rune_stone.name",
+      "mythology": "norse"
+    },
+    {
+      "id": "scarab_amulet",
+      "slot": "relic",
+      "nameKey": "item.scarab_amulet.name",
+      "mythology": "egyptian"
+    },
+    {
+      "id": "bronze_signet",
+      "slot": "ring",
+      "nameKey": "item.bronze_signet.name",
+      "mythology": "greek"
+    },
+    {
+      "id": "twisted_silver",
+      "slot": "ring",
+      "nameKey": "item.twisted_silver.name",
+      "mythology": "norse"
+    },
+    {
+      "id": "ankh_ring",
+      "slot": "ring",
+      "nameKey": "item.ankh_ring.name",
+      "mythology": "egyptian"
+    }
+  ]
+}

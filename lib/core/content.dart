@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'economy.dart';
+import 'equipment.dart';
 import 'models.dart';
 import 'stages.dart';
 
@@ -25,3 +26,6 @@ StageConfig parseStageConfig(String jsonText) =>
 
 Economy parseEconomy(String jsonText) =>
     Economy.fromJson(jsonDecode(jsonText) as Map<String, dynamic>);
+
+EquipmentConfig parseEquipment(String jsonText) =>
+    EquipmentConfig.fromJson(jsonDecode(jsonText) as Map<String, dynamic>);

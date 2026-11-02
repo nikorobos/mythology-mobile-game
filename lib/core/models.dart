@@ -148,6 +148,33 @@ class Unit {
         ai: ai,
       );
 
+  /// Copy with equipment bonuses: HP and ATK are multiplied, DEF and SPD
+  /// are added (never below 0).
+  Unit withBonus({
+    double hpMult = 1.0,
+    double atkMult = 1.0,
+    int def = 0,
+    int spd = 0,
+  }) =>
+      Unit(
+        id: id,
+        nameKey: nameKey,
+        mythology: mythology,
+        tags: tags,
+        role: role,
+        range: range,
+        rarity: rarity,
+        baseStats: Stats(
+          hp: (baseStats.hp * hpMult).round(),
+          atk: (baseStats.atk * atkMult).round(),
+          def: baseStats.def + def < 0 ? 0 : baseStats.def + def,
+          spd: baseStats.spd + spd < 0 ? 0 : baseStats.spd + spd,
+        ),
+        skills: skills,
+        ultimate: ultimate,
+        ai: ai,
+      );
+
   factory Unit.fromJson(Map<String, dynamic> json) => Unit(
         id: json['id'] as String,
         nameKey: json['nameKey'] as String,

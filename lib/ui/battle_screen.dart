@@ -210,6 +210,20 @@ class _BattleScreenState extends State<BattleScreen> {
                                     color: _cream,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w800)),
+                          if (_reward != null && _reward!.drops.isNotEmpty)
+                            Text(
+                                '${s.t('ui.drops')}: '
+                                '${_reward!.drops.map((i) => s.t('rarity.${i.rarity.name}')).join(', ')}',
+                                style: const TextStyle(
+                                    color: _gold,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800)),
+                          if (_reward != null && _reward!.scrapGold > 0)
+                            Text(
+                                '${s.t('ui.scrapped')} '
+                                '${formatNumber(_reward!.scrapGold)} ${s.t('ui.gold')}',
+                                style: const TextStyle(
+                                    color: _muted, fontSize: 12)),
                         ],
                       )
                     : Text(_banner,
