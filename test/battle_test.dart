@@ -4,6 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:theomyth/core/battle.dart';
 import 'package:theomyth/core/content.dart';
 import 'package:theomyth/core/models.dart';
+import 'package:theomyth/core/economy.dart';
+import 'package:theomyth/core/format.dart';
+import 'package:theomyth/core/player.dart';
 import 'package:theomyth/core/stages.dart';
 
 void main() {
@@ -253,6 +256,77 @@ void main() {
     // Far-away stages must not crash or overflow.
     expect(buildStage(100000, monsters, cfg).length, 5);
     expect(() => buildStage(0, monsters, cfg), throwsArgumentError);
+  });
+
+  group('economy and player', () {
+    final eco =
+        parseEconomy(File('assets/data/economy.json').readAsStringSync());
+
+    test('level multiplier and costs grow', () {
+      expect(eco.statMult(1), 1.0);
+      expect(eco.statMult(11), closeTo(2.2, 1e-9));
+      expect(eco.levelUpCost(1), 100);
+      expect(eco.levelUpCost(2) > eco.levelUpCost(1), isTrue);
+      expect(eco.levelUpCost(100000) > 0, isTrue); // capped, no overflow
+    });
+
+    test('rewards: win > loss > 0, grow with stage', () {
+      final win = eco.battleReward(1, won: true);
+      final loss = eco.battleReward(1, won: false);
+      expect(win, 50);
+      expect(loss, 10);
+      expect(eco.battleReward(10, won: true) > win, isTrue);
+      expect(eco.battleReward(100000, won: true) > 0, isTrue);
+    });
+
+    test('unitAtLevel scales HP and ATK only', () {
+      final h = heroes.first;
+      final l11 = unitAtLevel(h, 11, eco);
+      expect(l11.baseStats.hp, (h.baseStats.hp * 2.2).round());
+      expect(l11.baseStats.atk, (h.baseStats.atk * 2.2).round());
+      expect(l11.baseStats.def, h.baseStats.def);
+      expect(l11.baseStats.spd, h.baseStats.spd);
+      expect(l11.ultimate, isNotNull);
+    });
+
+    test('level up spends gold and needs enough gold', () {
+      final p = PlayerState(gold: 150);
+      expect(p.levelUp('heracles', eco), isTrue);
+      expect(p.levelOf('heracles'), 2);
+      expect(p.gold, 50);
+      expect(p.levelUp('heracles', eco), isFalse);
+      expect(p.levelOf('heracles'), 2);
+    });
+
+    test('battle result: gold always, stage only on a win', () {
+      final p = PlayerState.initial(eco);
+      expect(p.nextStage, 1);
+      p.recordBattle(stage: 1, won: false, economy: eco);
+      expect(p.nextStage, 1);
+      expect(p.gold, eco.startGold + 10);
+      p.recordBattle(stage: 1, won: true, economy: eco);
+      expect(p.nextStage, 2);
+      p.recordBattle(stage: 1, won: true, economy: eco); // replay older stage
+      expect(p.highestStageCleared, 1);
+    });
+
+    test('save JSON round trip, missing keys fall back', () {
+      final p = PlayerState(gold: 7, heroLevels: {'thor': 4}, highestStageCleared: 3);
+      final back = PlayerState.fromJson(p.toJson());
+      expect(back.gold, 7);
+      expect(back.levelOf('thor'), 4);
+      expect(back.highestStageCleared, 3);
+      final empty = PlayerState.fromJson({});
+      expect(empty.gold, 0);
+      expect(empty.levelOf('thor'), 1);
+    });
+  });
+
+  test('formatNumber abbreviates', () {
+    expect(formatNumber(999), '999');
+    expect(formatNumber(1500), '1.50K');
+    expect(formatNumber(12345), '12.3K');
+    expect(formatNumber(2500000), '2.50M');
   });
 
   test('scaled copies stats', () {

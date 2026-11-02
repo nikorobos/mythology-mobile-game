@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'economy.dart';
 import 'models.dart';
 import 'stages.dart';
 
@@ -21,3 +22,6 @@ Map<String, String> parseStrings(String jsonText) {
 /// Parses the endless-stage settings (assets/data/stages.json).
 StageConfig parseStageConfig(String jsonText) =>
     StageConfig.fromJson(jsonDecode(jsonText) as Map<String, dynamic>);
+
+Economy parseEconomy(String jsonText) =>
+    Economy.fromJson(jsonDecode(jsonText) as Map<String, dynamic>);

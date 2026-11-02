@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 
 import '../core/battle.dart';
+import '../core/format.dart';
 import '../core/models.dart';
 import '../l10n/strings.dart';
 
@@ -28,11 +29,15 @@ class BattleScreen extends StatefulWidget {
     required this.heroes,
     required this.enemies,
     required this.strings,
+    required this.onFinished,
   });
 
   final List<Unit> heroes;
   final List<Unit> enemies;
   final Strings strings;
+
+  /// Called once per finished fight; returns the gold earned.
+  final int Function(bool won) onFinished;
 
   @override
   State<BattleScreen> createState() => _BattleScreenState();
@@ -49,6 +54,7 @@ class _BattleScreenState extends State<BattleScreen> {
   int _speedIndex = 0;
   bool _auto = false;
   bool _done = false;
+  int? _reward;
   BattleEvent? _current;
 
   List<Unit> get _units => [...widget.heroes, ...widget.enemies];
@@ -73,6 +79,7 @@ class _BattleScreenState extends State<BattleScreen> {
     _pending.clear();
     _current = null;
     _done = false;
+    _reward = null;
     _startTimer();
   }
 
@@ -80,9 +87,11 @@ class _BattleScreenState extends State<BattleScreen> {
     if (_pending.isEmpty) {
       if (_battle.finished) {
         _timer?.cancel();
+        final reward = widget.onFinished(_battle.winner == Side.heroes);
         setState(() {
           _current = null;
           _done = true;
+          _reward = reward;
         });
         return;
       }
@@ -138,8 +147,8 @@ class _BattleScreenState extends State<BattleScreen> {
     return switch (e.kind) {
       EventKind.attack => e.amount == 0
           ? (s.t('status.block'), _muted)
-          : ('-${e.amount}', _red),
-      EventKind.heal => ('+${e.amount}', _green),
+          : ('-${formatNumber(e.amount)}', _red),
+      EventKind.heal => ('+${formatNumber(e.amount)}', _green),
       EventKind.stun => (s.t('status.stun'), _gold),
       EventKind.skip => (s.t('status.skip'), _gold),
       EventKind.taunt => (s.t('status.taunt'), _gold),
@@ -184,11 +193,23 @@ class _BattleScreenState extends State<BattleScreen> {
               height: 72,
               child: Center(
                 child: _done
-                    ? Text(_outcome,
-                        style: const TextStyle(
-                            color: _gold,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900))
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(_outcome,
+                              style: const TextStyle(
+                                  color: _gold,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w900)),
+                          if (_reward != null)
+                            Text(
+                                '+${formatNumber(_reward!)} ${s.t('ui.gold')}',
+                                style: const TextStyle(
+                                    color: _cream,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800)),
+                        ],
+                      )
                     : Text(_banner,
                         style: const TextStyle(color: _muted, fontSize: 16)),
               ),
@@ -303,7 +324,7 @@ class _BattleScreenState extends State<BattleScreen> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text('$hp / $max',
+              Text('${formatNumber(hp)} / ${formatNumber(max)}',
                   style: const TextStyle(color: _muted, fontSize: 11)),
               SizedBox(
                 height: 18,

@@ -1,18 +1,27 @@
 import 'package:flutter/services.dart' show rootBundle;
 
 import 'core/content.dart';
+import 'core/economy.dart';
 import 'core/models.dart';
 import 'core/stages.dart';
 import 'l10n/strings.dart';
+import 'state/player_controller.dart';
 
 const int maxSquadSize = 5;
 
 class GameContent {
-  const GameContent(this.heroes, this.monsters, this.stageConfig, this.strings);
+  const GameContent(
+    this.heroes,
+    this.monsters,
+    this.stageConfig,
+    this.economy,
+    this.strings,
+  );
 
   final List<Unit> heroes;
   final List<Unit> monsters;
   final StageConfig stageConfig;
+  final Economy economy;
   final Strings strings;
 
   /// Enemy team for any stage number (endless).
@@ -22,13 +31,24 @@ class GameContent {
   bool isBoss(int stage) => isBossStage(stage, stageConfig);
 }
 
-Future<GameContent> loadGameContent() async {
+/// Everything the UI needs: static content + the player's saved progress.
+class Session {
+  const Session(this.content, this.player);
+
+  final GameContent content;
+  final PlayerController player;
+}
+
+Future<Session> loadSession() async {
   final heroes =
       parseUnits(await rootBundle.loadString('assets/data/heroes.json'));
   final monsters =
       parseUnits(await rootBundle.loadString('assets/data/monsters.json'));
   final config =
       parseStageConfig(await rootBundle.loadString('assets/data/stages.json'));
+  final economy =
+      parseEconomy(await rootBundle.loadString('assets/data/economy.json'));
   final strings = await Strings.load();
-  return GameContent(heroes, monsters, config, strings);
+  final player = await PlayerController.load(economy);
+  return Session(GameContent(heroes, monsters, config, economy, strings), player);
 }

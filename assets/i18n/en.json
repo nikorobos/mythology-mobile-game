@@ -108,5 +108,8 @@
   "chapter.ragnarok.intro": "In Norse myth, Ragnarok is the end of the world, when the wolf Fenrir breaks his chains and battles the gods.",
   "chapter.weighing_heart.title": "The Weighing of the Heart",
   "chapter.weighing_heart.intro": "In Egyptian belief, the heart of the dead was weighed against the feather of Ma'at. Ammit devoured the hearts of those found unworthy.",
-  "ui.chapter": "Chapter"
+  "ui.chapter": "Chapter",
+  "ui.gold": "Gold",
+  "ui.level": "Lv",
+  "ui.level_up": "Level up"
 }

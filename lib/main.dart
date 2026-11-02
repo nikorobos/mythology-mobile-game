@@ -31,16 +31,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late final Future<GameContent> _content = loadGameContent();
+  late final Future<Session> _session = loadSession();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: FutureBuilder<GameContent>(
-          future: _content,
+        child: FutureBuilder<Session>(
+          future: _session,
           builder: (context, snap) {
-            final c = snap.data;
+            final session = snap.data;
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -58,12 +58,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 220,
                   height: 52,
                   child: FilledButton(
-                    onPressed: c == null
+                    onPressed: session == null
                         ? null
                         : () => Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => SquadScreen(content: c),
+                              builder: (_) => SquadScreen(session: session),
                             )),
-                    child: Text(c?.strings.t('ui.battle') ?? '...'),
+                    child: Text(session?.content.strings.t('ui.battle') ?? '...'),
                   ),
                 ),
               ],

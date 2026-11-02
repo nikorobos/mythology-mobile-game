@@ -1,0 +1,11 @@
+{
+  "_note": "PLACEHOLDER economy. Hero stat at level L = base * (1 + levelStatGrowth*(L-1)). Level-up cost = levelCostBase * levelCostGrowth^(L-1). Reward = winGoldBase * winGoldGrowth^(stage-1); a loss pays loseGoldFraction of that.",
+  "startGold": 500,
+  "maxLevel": 100,
+  "levelStatGrowth": 0.12,
+  "levelCostBase": 100,
+  "levelCostGrowth": 1.15,
+  "winGoldBase": 50,
+  "winGoldGrowth": 1.1,
+  "loseGoldFraction": 0.2
+}
