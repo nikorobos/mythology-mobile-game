@@ -49,7 +49,7 @@ class SquadModel extends ChangeNotifier {
   /// The selected stage, kept within what the player may attempt.
   int stage() {
     final max = session.player.state.nextStage;
-    return (_stage ?? max).clamp(1, max);
+    return (_stage ?? max).clamp(1, max).toInt();
   }
 
   void setStage(int stage) {

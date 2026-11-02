@@ -180,5 +180,9 @@
   "ui.your_squad": "Η ομάδα σου",
   "ui.squad_pick_title": "Διάλεξε την ομάδα σου",
   "ui.prev_stage": "Προηγούμενο στάδιο",
-  "ui.next_stage": "Επόμενο στάδιο"
+  "ui.next_stage": "Επόμενο στάδιο",
+  "ui.back": "Πίσω",
+  "ui.ult_hint": "Πάτα μια λαμπερή φιγούρα για να εξαπολύσεις το απόλυτο",
+  "ui.ult_ready": "έτοιμο",
+  "ui.ult_charging": "φορτίζει"
 }

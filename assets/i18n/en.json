@@ -180,5 +180,9 @@
   "ui.your_squad": "Your squad",
   "ui.squad_pick_title": "Choose your squad",
   "ui.prev_stage": "Previous stage",
-  "ui.next_stage": "Next stage"
+  "ui.next_stage": "Next stage",
+  "ui.back": "Back",
+  "ui.ult_hint": "Tap a glowing portrait to unleash an ultimate",
+  "ui.ult_ready": "ready",
+  "ui.ult_charging": "charging"
 }

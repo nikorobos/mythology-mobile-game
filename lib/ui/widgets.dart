@@ -349,7 +349,7 @@ class Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final v = value.isNaN ? 0.0 : value.clamp(0.0, 1.0);
+    final double v = value.isNaN ? 0.0 : value.clamp(0.0, 1.0).toDouble();
     return Container(
       height: height,
       decoration: BoxDecoration(
@@ -620,4 +620,92 @@ class GoldLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       Text(text.toUpperCase(), style: labelStyle(color: color));
+}
+
+// ------------------------------------------------------------- monsters
+
+const _monsterBodies = [
+  Color(0xFF2B2B3F),
+  Color(0xFF7B4A3A),
+  Color(0xFF3E3A66),
+  Color(0xFF2E4A3A),
+];
+const _monsterEyes = [
+  Color(0xFF5BFFE0),
+  Color(0xFFE8402F),
+  Color(0xFFF2D45E),
+];
+
+class _MonsterPainter extends CustomPainter {
+  _MonsterPainter(this.seed);
+
+  final int seed;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 80, size.height / 100);
+    final body = _monsterBodies[seed % _monsterBodies.length];
+    final eyes = _monsterEyes[(seed ~/ 5) % _monsterEyes.length];
+    final line = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeJoin = StrokeJoin.round
+      ..color = Pal.outline;
+    void shape(Path p, Color c) {
+      canvas.drawPath(p, Paint()..color = c);
+      canvas.drawPath(p, line);
+    }
+
+    canvas.drawOval(const Rect.fromLTWH(16, 90, 48, 10),
+        Paint()..color = const Color(0x4D000000));
+    shape(
+        Path()
+          ..addRRect(RRect.fromRectAndRadius(
+              const Rect.fromLTWH(22, 54, 36, 30), const Radius.circular(12))),
+        body);
+    shape(
+        Path()
+          ..moveTo(24, 28)
+          ..lineTo(20, 2)
+          ..lineTo(36, 18)
+          ..close(),
+        body);
+    shape(
+        Path()
+          ..moveTo(56, 28)
+          ..lineTo(60, 2)
+          ..lineTo(44, 18)
+          ..close(),
+        body);
+    shape(
+        Path()
+          ..addOval(Rect.fromCircle(center: const Offset(40, 36), radius: 18)),
+        body);
+    final eye = Paint()..color = eyes;
+    canvas.drawCircle(const Offset(33, 32), 3, eye);
+    canvas.drawCircle(const Offset(47, 32), 3, eye);
+    canvas.drawCircle(const Offset(33, 32), 3, line..strokeWidth = 1.5);
+    canvas.drawCircle(const Offset(47, 32), 3, line);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_MonsterPainter old) => old.seed != seed;
+}
+
+/// PLACEHOLDER art for monsters (same idea as [HeroBust]).
+class MonsterFigure extends StatelessWidget {
+  const MonsterFigure({super.key, required this.unit, this.size = 80});
+
+  final Unit unit;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+        child: CustomPaint(
+          size: Size(size, size * 1.25),
+          painter: _MonsterPainter(_seedOf(unit.id)),
+        ),
+      );
 }

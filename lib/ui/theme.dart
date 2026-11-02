@@ -81,8 +81,14 @@ TextStyle lilita(double size,
 
 /// Body and labels. Variable font: [weight] 200-1000 via the wght axis.
 TextStyle nunito(double size,
-        {int weight = 800, Color color = Pal.cream, double? letterSpacing}) =>
+        {int weight = 800,
+        Color color = Pal.cream,
+        double? letterSpacing,
+        bool shadows = false}) =>
     TextStyle(
+      shadows: shadows
+          ? const [Shadow(color: Color(0xB31B1030), offset: Offset(0, 1.5))]
+          : null,
       fontFamily: 'Nunito',
       fontSize: size,
       color: color,

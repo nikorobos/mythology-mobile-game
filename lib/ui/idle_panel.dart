@@ -66,7 +66,8 @@ class _IdlePanelState extends State<IdlePanel> {
         final cap = player.maxIdleGold;
         final full = pending >= cap;
         final last = player.state.lastCollectMs ?? player.nowMs;
-        final away = ((player.nowMs - last) ~/ 60000).clamp(0, eco.maxIdleMinutes);
+        final int away =
+            ((player.nowMs - last) ~/ 60000).clamp(0, eco.maxIdleMinutes).toInt();
         final canCollect = pending > 0 && !_busy;
         return Container(
           padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
