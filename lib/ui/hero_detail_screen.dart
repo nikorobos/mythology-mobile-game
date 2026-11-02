@@ -342,22 +342,29 @@ class HeroDetailScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: () => showModalBottomSheet<void>(
           context: context,
+          useSafeArea: true,
           backgroundColor: Pal.bg,
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-          builder: (_) => Padding(
+          builder: (_) => SafeArea(
+            top: false,
+            child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (ult) GoldLabel(s.t('ui.ult')),
-                Text(s.t(k.nameKey), style: lilita(24)),
-                const SizedBox(height: 8),
-                Text(s.t(k.descKey),
-                    style: nunito(15, weight: 600, color: Pal.soft)),
-              ],
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (ult) GoldLabel(s.t('ui.ult')),
+                  Text(s.t(k.nameKey), style: lilita(24)),
+                  const SizedBox(height: 8),
+                  Text(s.t(k.descKey),
+                      style: nunito(15, weight: 600, color: Pal.soft)),
+                ],
+              ),
             ),
+          ),
           ),
         ),
         child: Padding(

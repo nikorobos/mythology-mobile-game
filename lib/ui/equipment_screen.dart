@@ -171,18 +171,22 @@ class EquipmentScreen extends StatelessWidget {
   void _pick(BuildContext context, String slot) {
     showModalBottomSheet<void>(
       context: context,
+    useSafeArea: true,
       backgroundColor: Pal.bg,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.7,
-        builder: (_, scroll) => _PickerList(
-            session: session,
-            heroId: heroId,
-            slot: slot,
-            controller: scroll),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.7,
+          builder: (_, scroll) => _PickerList(
+              session: session,
+              heroId: heroId,
+              slot: slot,
+              controller: scroll),
+        ),
       ),
     );
   }

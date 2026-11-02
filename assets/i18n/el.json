@@ -199,5 +199,6 @@
   "range.melee": "Σώμα με σώμα",
   "range.ranged": "Εξ αποστάσεως",
   "ui.summon_title": "Κάλεσε τους ήρωες των μύθων",
-  "ui.summon_results": "Κάλεσες"
+  "ui.summon_results": "Κάλεσες",
+  "ui.enraged": "ΘΥΜΩΜΕΝΟΙ"
 }

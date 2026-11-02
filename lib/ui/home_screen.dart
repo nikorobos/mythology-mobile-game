@@ -499,16 +499,20 @@ class _SquadStrip extends StatelessWidget {
 void showSquadPicker(BuildContext context, Session session, SquadModel squad) {
   showModalBottomSheet<void>(
     context: context,
+    useSafeArea: true,
     isScrollControlled: true,
     backgroundColor: Pal.bg,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-    builder: (ctx) => DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.7,
-      maxChildSize: 0.9,
-      builder: (_, scroll) => _SquadPicker(
-          session: session, squad: squad, controller: scroll),
+    builder: (ctx) => SafeArea(
+      top: false,
+      child: DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.7,
+        maxChildSize: 0.9,
+        builder: (_, scroll) => _SquadPicker(
+            session: session, squad: squad, controller: scroll),
+      ),
     ),
   );
 }

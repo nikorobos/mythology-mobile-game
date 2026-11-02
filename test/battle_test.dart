@@ -498,4 +498,29 @@ void main() {
     final r = simulateBattle([hero], [foe]);
     expect(r.winner, Side.heroes);
   });
+
+  test('a stalled fight ends by enrage: someone dies before the hard cap', () {
+    // The foe is far too tough to kill, so without enrage this would stall.
+    final hero = mk('stalled_hero', Range.melee, 1000, 10, 10, const []);
+    final foe = mk('wall_foe', Range.melee, 1000000, 10, 1, const []);
+    final b = Battle([hero], [foe])..auto = true;
+    while (!b.finished) {
+      b.step();
+    }
+    expect(b.winner, Side.enemies);
+    expect(b.hs.first.alive, isFalse); // defeat came from the hero dying
+    expect(b.round, lessThan(b.maxRounds));
+  });
+
+  test('enrage does not touch heroes or early rounds', () {
+    final hero = mk('h', Range.melee, 1000, 10, 10, const []);
+    final foe = mk('f', Range.melee, 1000, 10, 1, const []);
+    final b = Battle([hero], [foe], enrageAfter: 3);
+    while (b.round < 3) {
+      b.step();
+    }
+    expect(b.enraged, isFalse);
+    expect(b.hs.first.enrage, 1.0);
+    expect(b.es.first.enrage, 1.0);
+  });
 }

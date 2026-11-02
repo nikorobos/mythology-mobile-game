@@ -46,12 +46,18 @@ class Combatant {
   double reflectPct = 0;
   int shield = 0;
 
+  /// Enemy damage multiplier that grows once a fight drags on (see
+  /// [Battle.enrageAfter]). Always 1.0 for heroes.
+  double enrage = 1.0;
+
   bool get alive => hp > 0;
 
   bool get ultReady => unit.ultimate != null && energy >= maxEnergy;
 
-  int get atk =>
-      (unit.baseStats.atk * (1 + (buffTurns > 0 ? buffPct : 0))).round();
+  int get atk => (unit.baseStats.atk *
+          (1 + (buffTurns > 0 ? buffPct : 0)) *
+          enrage)
+      .round();
 }
 
 /// One action. Indexes refer to the combined list [heroes..., enemies...].
@@ -110,13 +116,24 @@ Combatant? pickTarget(List<Combatant> targets) {
 /// Steppable battle. Call [step] to run one actor's action and get the events
 /// it produced. Deterministic for the same units and the same player input.
 class Battle {
-  Battle(List<Unit> heroes, List<Unit> enemies, {this.maxRounds = 50})
+  Battle(List<Unit> heroes, List<Unit> enemies,
+      {this.maxRounds = 100, this.enrageAfter = 30})
       : hs = [for (final u in heroes) Combatant(u, Side.heroes)],
         es = [for (final u in enemies) Combatant(u, Side.enemies)] {
     all = [...hs, ...es];
   }
 
+  /// Hard safety cap. Reaching it is a defeat (never a draw). In normal play
+  /// the enrage below ends a long fight long before this.
   final int maxRounds;
+
+  /// After this many rounds the enemies enrage: +50% damage per extra round,
+  /// so a stalled fight always ends with someone dead instead of timing out.
+  final int enrageAfter;
+
+  /// True once the enemies are enraged (the UI shows a warning).
+  bool get enraged => round > enrageAfter;
+
   final List<Combatant> hs;
   final List<Combatant> es;
   late final List<Combatant> all;
@@ -140,7 +157,7 @@ class Battle {
 
   /// Win or defeat only. Heroes win only by killing every enemy while at
   /// least one hero lives; anything else (all heroes dead, both sides dead,
-  /// or the round limit reached) is a defeat.
+  /// or the hard round cap reached) is a defeat.
   Side get winner =>
       !_sideAlive(es) && _sideAlive(hs) ? Side.heroes : Side.enemies;
 
@@ -164,6 +181,10 @@ class Battle {
     while (!finished && events.length == start) {
       if (_cursor >= _queue.length) {
         round++;
+        final enrage = round > enrageAfter ? 1 + 0.5 * (round - enrageAfter) : 1.0;
+        for (final c in es) {
+          c.enrage = enrage;
+        }
         // Stable sort: higher speed first, ties keep list order (heroes first).
         _queue = [...all]..sort((a, b) {
             final bySpd = b.unit.baseStats.spd.compareTo(a.unit.baseStats.spd);
@@ -382,9 +403,12 @@ class Battle {
 BattleResult simulateBattle(
   List<Unit> heroes,
   List<Unit> enemies, {
-  int maxRounds = 50,
+  int maxRounds = 100,
+  int enrageAfter = 30,
 }) {
-  final battle = Battle(heroes, enemies, maxRounds: maxRounds)..auto = true;
+  final battle = Battle(heroes, enemies,
+      maxRounds: maxRounds, enrageAfter: enrageAfter)
+    ..auto = true;
   while (!battle.finished) {
     battle.step();
   }

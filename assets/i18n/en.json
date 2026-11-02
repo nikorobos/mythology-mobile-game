@@ -199,5 +199,6 @@
   "range.melee": "Melee",
   "range.ranged": "Ranged",
   "ui.summon_title": "Call the heroes of myth",
-  "ui.summon_results": "You summoned"
+  "ui.summon_results": "You summoned",
+  "ui.enraged": "ENRAGED"
 }

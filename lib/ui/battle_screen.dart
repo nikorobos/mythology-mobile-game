@@ -127,7 +127,8 @@ class _BattleScreenState extends State<BattleScreen> {
     final e = _current;
     if (e == null) return '';
     final s = widget.strings;
-    final round = '${s.t('ui.round')} ${e.round}';
+    final round = '${s.t('ui.round')} ${e.round}'
+        '${_battle.enraged ? '  -  ${s.t('ui.enraged')}' : ''}';
     if (e.skillId == null) return round;
     return '$round  -  ${s.t('skill.${e.skillId}.name')}';
   }
